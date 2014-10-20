@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "homepage": "http://bweston.me",
   "authors": [
-    "Bradley Weston <me@bweston.me>"
+    "Bradley Weston <me@bweston.me>",
+    "Kyle Needham <kylex691@hotmail.com>"
   ],
   "description": "Auto-complete input.",
   "main": "dist/autocomplete.js",
