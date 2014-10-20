@@ -31,7 +31,13 @@ module.exports = function(grunt)
       }
     },
     jasmine: {
-      src: ['dist/autocomplete.js'],
+      src: [
+        'node_modules/jquery/dist/jquery.js',
+        'node_modules/underscore/underscore.js',
+        'node_modules/backbone/backbone.js',
+        'node_modules/backbone.marionette/lib/backbone.marionette.js',
+        'dist/autocomplete.js'
+      ],
       options: {
         specs: 'spec/javascripts/**/*.spec.js'
       }
