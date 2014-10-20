@@ -9,15 +9,7 @@ module.exports = function(grunt)
   // Core tasks
   var tasks = ['coffee', 'jasmine', 'uglify'];
 
-  // Counter configuration
   grunt.initConfig({
-    uglify: {
-      dist: {
-        files: {
-          'dist/autocomplete.min.js': 'dist/autocomplete.js'
-        }
-      }
-    },
     coffee: {
       main: {
         files: [{
@@ -42,6 +34,13 @@ module.exports = function(grunt)
       src: ['dist/autocomplete.js'],
       options: {
         specs: 'spec/javascripts/**/*.spec.js'
+      }
+    },
+    uglify: {
+      dist: {
+        files: {
+          'dist/autocomplete.min.js': 'dist/autocomplete.js'
+        }
       }
     },
     watch: {
