@@ -1,0 +1,24 @@
+{
+  "name": "lw-autocomplete",
+  "version": "0.0.1",
+  "homepage": "http://bweston.me",
+  "authors": [
+    "Bradley Weston <me@bweston.me>"
+  ],
+  "description": "Auto-complete input.",
+  "main": "dist/autocomplete.js",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "autocomplete",
+    "auto",
+    "complete"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ]
+}
