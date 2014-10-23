@@ -30,10 +30,6 @@
     "grunt-contrib-watch" : "latest",
     "grunt-contrib-coffee": "latest",
     "grunt-contrib-jasmine": "latest",
-    "grunt-contrib-uglify": "latest",
-    "jquery": "latest",
-    "underscore": "latest",
-    "backbone": "latest",
-    "backbone.marionette": "latest"
+    "grunt-contrib-uglify": "latest"
   }
 }

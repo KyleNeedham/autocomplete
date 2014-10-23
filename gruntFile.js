@@ -12,13 +12,19 @@ module.exports = function(grunt)
   grunt.initConfig({
     coffee: {
       main: {
-        files: [{
+        options: {
           expand: true,
-          cwd: 'src/',
-          src: '*.coffee',
-          dest: 'dist/',
-          ext: '.js'
-        }]
+          join: true
+        },
+        files: {
+          'dist/autocomplete.js': [
+            'src/header.coffee',
+            'src/autocomplete.collection.coffee',
+            'src/autocomplete.childview.coffee',
+            'src/autocomplete.collectionview.coffee',
+            'src/autocomplete.behavior.coffee'
+          ]
+        }
       },
       specs: {
         files: [{
