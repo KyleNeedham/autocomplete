@@ -12,13 +12,6 @@
     className: 'ac-suggestions dropdown-menu'
 
     ###*
-     * @type {AutoCompleteChildView}
+     * @type {AutoComplete.ChildView}
     ###
     childView: AutoComplete.ChildView
-
-    ###*
-     * Setup CollectionView
-     * 
-     * @param {Object} options
-    ###
-    initialize: (options) ->
