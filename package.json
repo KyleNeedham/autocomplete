@@ -1,5 +1,5 @@
 {
-  "name": "lw-autocomplete",
+  "name": "marionette-autocomplete",
   "version": "0.0.1",
   "description": "Marionette autocomplete behavior",
   "main": "dist/autocomplete.js",

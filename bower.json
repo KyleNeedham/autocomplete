@@ -1,5 +1,5 @@
 {
-  "name": "lw-autocomplete",
+  "name": "marionette-autocomplete",
   "version": "0.0.1",
   "homepage": "http://bweston.me",
   "authors": [
@@ -13,6 +13,7 @@
     "globals"
   ],
   "keywords": [
+    "beh"
     "autocomplete",
     "auto",
     "complete"
