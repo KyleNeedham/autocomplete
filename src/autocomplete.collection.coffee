@@ -26,9 +26,9 @@
     ###
     _initializeListeners: ->
       @listenTo @, 'find', @fetchNewSuggestions
-      @listenTo @, 'select:active', @selectActive
-      @listenTo @, 'highlight:next', @selectNext
-      @listenTo @, 'highlight:previous', @selectPrevious
+      @listenTo @, 'select', @select
+      @listenTo @, 'highlight:next', @highlightNext
+      @listenTo @, 'highlight:previous', @highlightPrevious
       @listenTo @, 'clear', @reset
 
     ###*
@@ -139,29 +139,29 @@
 
     ###*
      * Select first suggestion unless the suggestion list
-     * has been navigated then select where it was navigated to
+     * has been navigated then select at the current index
     ###
-    selectActive: ->
-      @trigger 'selected', @at if @isStarted() then @index else 0
+    select: ->
+      @trigger 'select', @at if @isStarted() then @index else 0
 
     ###*
-     * Select previous item
+     * highlight previous item
     ###
-    selectPrevious: ->
+    highlightPrevious: ->
       unless @isFirst() or not @isStarted()
-        @deselect @index
-        @select @index = @index - 1
+        @deHighlight @index
+        @highlight @index = @index - 1
 
     ###*
-     * Select next item
+     * highlight next item
     ###
-    selectNext: ->
+    highlightNext: ->
       unless @isLast()
 
         if @isStarted()
-          @deselect @index
+          @deHighlight @index
 
-        @select @index = @index + 1
+        @highlight @index = @index + 1
 
     ###*
      * Check to see if the first suggestion is highlighted
@@ -189,22 +189,22 @@
       @index isnt -1
 
     ###*
-     * Trigger selection on the model
+     * Trigger highlight on suggestion
      * 
      * @param  {Number} index
      * @return {Backbone.Model}
     ###
-    select: (index) ->
+    highlight: (index) ->
       model = @at index
       model.trigger 'highlight', model
 
     ###*
-     * Trigger deselection on the model
+     * Trigger highliht removal on the model
      * 
      * @param  {Number} index
      * @return {Backbone.Model}
     ###
-    deselect: (index) ->
+    deHighlight: (index) ->
       model = @at index
       model.trigger 'highlight:remove', model
 
