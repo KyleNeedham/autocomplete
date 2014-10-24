@@ -43,4 +43,4 @@
     ###
     select: (e) ->
       e.preventDefault()
-      @model.trigger 'select', @model
+      @model.trigger 'selected', @model

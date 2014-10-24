@@ -83,7 +83,7 @@
       @listenTo @suggestionsCollection, 'all', @relayCollectionEvent
       @listenTo @, "#{@eventPrefix}:open", @open
       @listenTo @, "#{@eventPrefix}:close", @close
-      @listenTo @, "#{@eventPrefix}:suggestions:select", @completeSuggestion
+      @listenTo @, "#{@eventPrefix}:suggestions:selected", @completeSuggestion
 
     ###*
      * Initialize AutoComplete once the view el has been populated
@@ -169,9 +169,9 @@
       unless @suggestionsCollection.isEmpty()
         switch keyname
           when 'right'
-            @suggestionsCollection.trigger 'select:active' if $e.target.value.length is $e.target.selectionEnd
+            @suggestionsCollection.trigger 'select' if $e.target.value.length is $e.target.selectionEnd
           when 'enter'
-            @suggestionsCollection.trigger 'select:active'
+            @suggestionsCollection.trigger 'select'
           when 'down'
             @suggestionsCollection.trigger 'highlight:next'
           when 'up'
