@@ -1,6 +1,6 @@
 
   class AutoComplete.Behavior extends Marionette.Behavior
-
+    
     ###*
      * @type {Object}
     ###
@@ -94,7 +94,7 @@
 
     ###*
      * Wrap the input element inside the `containerTemplate` and
-     * then append the `dropdownTemplate`
+     * then append `AutoComplete.CollectionView`
     ###
     _initializeAutoComplete: ->
       @ui.input.wrap @options.containerTemplate
@@ -105,7 +105,7 @@
     ###*
      * Setup Collection view
      * 
-     * @return {AutoCompleteCollectionView}
+     * @return {AutoComplete.CollectionView}
     ###
     _getCollectionView: ->
       new AutoComplete.CollectionView
@@ -124,12 +124,15 @@
 
     ###*
      * Relay the collecction events
+     *
+     * @param {String} name
+     * @param {Array} args
     ###
     relayCollectionEvent: (name, args) ->
       @triggerShared "#{@eventPrefix}:suggestions:#{name}", args
 
     ###*
-     * Trigger an event on the behavior and view
+     * Trigger an event on this and view
     ###
     triggerShared: ->
       @trigger arguments...
@@ -213,7 +216,7 @@
       @suggestionsCollection.trigger 'clear'
 
     ###*
-     * Clean up views
+     * Clean up `AutoComplete.CollectionView`
     ###
     onDestroy: ->
       @collectionView.destroy()
