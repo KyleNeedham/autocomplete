@@ -13,7 +13,8 @@
     "globals"
   ],
   "keywords": [
-    "beh"
+    "marionette",
+    "behavior",
     "autocomplete",
     "auto",
     "complete"
