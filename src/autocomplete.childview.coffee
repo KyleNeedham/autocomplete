@@ -11,7 +11,7 @@
     ###*
      * @type {String}
     ###
-    template: _.template '<a href="#" data-action="select"><%= value %></a>'
+    template: _.template '<a href="#"><%= value %></a>'
 
     ###*
      * @type {Object}
