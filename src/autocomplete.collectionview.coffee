@@ -10,8 +10,3 @@
      * @type {String}
     ###
     className: 'ac-suggestions dropdown-menu'
-
-    ###*
-     * @type {AutoComplete.ChildView}
-    ###
-    childView: AutoComplete.ChildView
