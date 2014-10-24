@@ -4,11 +4,13 @@
 
   (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
-      return define(['jquery', 'underscore', 'backbone', 'marionette'], factory);
+      return define(['underscore', 'jquery', 'backbone', 'marionette'], function(_, $, Backbone, Marionette) {
+        return factory(root, {}, _, $, Backbone, Marionette);
+      });
     } else {
-      return root.AutoComplete = factory(root, {}, root.Backbone.$, root._, root.Backbone, root.Backbone.Marionette);
+      return root.AutoComplete = factory(root, {}, root._, root.jQuery, root.Backbone, root.Backbone.Marionette);
     }
-  })(this, function(root, AutoComplete, $, _, Backbone, Marionette) {
+  })(this, function(root, AutoComplete, _, $, Backbone, Marionette) {
     AutoComplete.Collection = (function(_super) {
       __extends(Collection, _super);
 
@@ -195,7 +197,7 @@
        */
 
       Collection.prototype.select = function() {
-        return this.trigger('select', this.at(this.isStarted() ? this.index : 0));
+        return this.trigger('selected', this.at(this.isStarted() ? this.index : 0));
       };
 
 
@@ -366,7 +368,7 @@
 
       ChildView.prototype.select = function(e) {
         e.preventDefault();
-        return this.model.trigger('select', this.model);
+        return this.model.trigger('selected', this.model);
       };
 
       return ChildView;
@@ -508,7 +510,7 @@
         this.listenTo(this.suggestionsCollection, 'all', this.relayCollectionEvent);
         this.listenTo(this, "" + this.eventPrefix + ":open", this.open);
         this.listenTo(this, "" + this.eventPrefix + ":close", this.close);
-        return this.listenTo(this, "" + this.eventPrefix + ":suggestions:select", this.completeSuggestion);
+        return this.listenTo(this, "" + this.eventPrefix + ":suggestions:selected", this.completeSuggestion);
       };
 
 
@@ -632,11 +634,11 @@
           switch (keyname) {
             case 'right':
               if ($e.target.value.length === $e.target.selectionEnd) {
-                return this.suggestionsCollection.trigger('select:active');
+                return this.suggestionsCollection.trigger('select');
               }
               break;
             case 'enter':
-              return this.suggestionsCollection.trigger('select:active');
+              return this.suggestionsCollection.trigger('select');
             case 'down':
               return this.suggestionsCollection.trigger('highlight:next');
             case 'up':
