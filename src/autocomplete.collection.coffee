@@ -9,8 +9,8 @@
      * @param {Object} options
     ###
     constructor: (models, @options) ->
-      @setDataset models
-      super [], options
+      @setDataset options.data
+      super
 
     ###*
      * Initialize AutoCompleteCollection
@@ -47,7 +47,7 @@
      * @return {Object}
     ###
     parse: (suggestions, limit) ->
-      suggestions = _.take suggestions, @options.paramValues.limit if limit
+      suggestions = _.take suggestions, @options.values.limit if limit
 
       _.map suggestions, (suggestion) ->
         value: @getValue suggestion
@@ -73,10 +73,10 @@
     buildParams: (search) ->
       data = {}
 
-      data[@options.paramKeys.search] = search 
+      data[@options.keys.search] = search 
 
-      _.each @options.paramKeys, (key) ->
-        data[key] ?= @options.paramValues[key]
+      _.each @options.keys, (key) ->
+        data[key] ?= @options.values[key]
       , @
 
       { data }
@@ -105,7 +105,7 @@
       matches = []
 
       _.each @dataset, (suggestion) ->
-        return false if matches.length >= @options.paramValues.limit
+        return false if matches.length >= @options.values.limit
 
         matches.push suggestion if @matches suggestion.value, search
 

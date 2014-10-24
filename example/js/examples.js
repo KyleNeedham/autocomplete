@@ -6,13 +6,17 @@ var ItemView = Backbone.Marionette.ItemView.extend({
 
   template: '#example',
 
-    behaviors: {
-      AutoComplete: {
-        behaviorClass: AutoComplete,
-        type: 'dataset',
-        data: countries
+  behaviors: {
+    AutoComplete: {
+      behaviorClass: AutoComplete.Behavior,
+      collection: {
+        options: {
+          type: 'dataset',
+          data: countries
+        }
       }
     }
+  }
 });
 
 (a = new ItemView).render()

@@ -6,21 +6,28 @@
     ###
     defaults:
       containerTemplate: '<div class="ac-container dropdown"></div>'
-      type: 'remote'
-      data: []
-      remote: null
-      valueKey: 'value'
-
-      paramKeys:
-        search: 'search'
-        limit: 'limit'
-
-      paramValues:
-        search: null
-        limit: 10
-
       rateLimit: 500
       minLength: 1
+      
+      collection:
+        definition: AutoComplete.Collection
+        options:
+          type: 'remote'
+          remote: null
+          data: []
+          valueKey: 'value'
+          keys:
+            search: 'search'
+            limit: 'limit'
+          values:
+            search: null
+            limit: 10
+
+      collectionView:
+        definition: AutoComplete.CollectionView
+
+      childView:
+        definition: AutoComplete.ChildView
 
     ###*
      * @type {String}
@@ -52,35 +59,19 @@
       'blur @ui.input': 'onBlur'
 
     ###*
-     * Initialize AutoComplete
-     * 
-     * @param {Object} options
+     * Initialize AutoComplete 
     ###
     initialize: (options) ->
-      @options.paramKeys = _.extend @defaults.paramKeys, @options.paramKeys
-      @options.paramValues = _.extend @defaults.paramValues, @options.paramValues
+      @options = $.extend yes, {}, @defaults, options
+      @suggestions = new @options.collection.definition [], @options.collection.options
       @updateSuggestions = _.throttle @_updateSuggestions, @options.rateLimit
-      @_initializeSuggestionsCollection()
       @_initializeListeners()
-
-    ###*
-     * Setup the remote collection, passing options required
-     * 
-     * @return {AutoCompleteCollection}
-    ###
-    _initializeSuggestionsCollection: ->
-      @suggestionsCollection =
-        new AutoComplete.Collection @options.data, _.omit @options, [
-          'containerTemplate'
-          'rateLimit'
-          'minLength'
-        ]
 
     ###*
      * Listen to relavent events
     ###
     _initializeListeners: ->
-      @listenTo @suggestionsCollection, 'all', @relayCollectionEvent
+      @listenTo @suggestions, 'all', @relayCollectionEvent
       @listenTo @, "#{@eventPrefix}:open", @open
       @listenTo @, "#{@eventPrefix}:close", @close
       @listenTo @, "#{@eventPrefix}:suggestions:selected", @completeSuggestion
@@ -108,8 +99,9 @@
      * @return {AutoComplete.CollectionView}
     ###
     _getCollectionView: ->
-      new AutoComplete.CollectionView
-        collection: @suggestionsCollection
+      new @options.collectionView.definition
+        childView: @options.childView.definition
+        collection: @suggestions
 
     ###*
      * Set input attributes
@@ -166,16 +158,16 @@
     doAction: (keycode, $e) ->
       keyname = @actionKeysMap[keycode]
       
-      unless @suggestionsCollection.isEmpty()
+      unless @suggestions.isEmpty()
         switch keyname
           when 'right'
-            @suggestionsCollection.trigger 'select' if $e.target.value.length is $e.target.selectionEnd
+            @suggestions.trigger 'select' if $e.target.value.length is $e.target.selectionEnd
           when 'enter'
-            @suggestionsCollection.trigger 'select'
+            @suggestions.trigger 'select'
           when 'down'
-            @suggestionsCollection.trigger 'highlight:next'
+            @suggestions.trigger 'highlight:next'
           when 'up'
-            @suggestionsCollection.trigger 'highlight:previous'
+            @suggestions.trigger 'highlight:previous'
           when 'esc'
             @trigger "#{@eventPrefix}:close"
 
@@ -187,7 +179,7 @@
     ###
     _updateSuggestions: (suggestionPartial) ->
       @triggerShared "#{@eventPrefix}:open" unless @isOpen
-      @suggestionsCollection.trigger 'find', suggestionPartial
+      @suggestions.trigger 'find', suggestionPartial
 
     ###*
      * Open the autocomplete suggestions dropdown
@@ -213,10 +205,12 @@
     close: (suggestionPartial) ->
       @isOpen = no
       @ui.container.removeClass 'open'
-      @suggestionsCollection.trigger 'clear'
+      @suggestions.trigger 'clear'
 
     ###*
      * Clean up `AutoComplete.CollectionView`
     ###
     onDestroy: ->
       @collectionView.destroy()
+
+  AutoComplete
