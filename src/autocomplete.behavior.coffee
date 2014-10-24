@@ -1,6 +1,6 @@
 
   class AutoComplete.Behavior extends Marionette.Behavior
-    
+
     ###*
      * @type {Object}
     ###
@@ -83,7 +83,7 @@
       @listenTo @suggestionsCollection, 'all', @relayCollectionEvent
       @listenTo @, "#{@eventPrefix}:open", @open
       @listenTo @, "#{@eventPrefix}:close", @close
-      @listenTo @, "#{@eventPrefix}:suggestions:selected", @completeSuggestion
+      @listenTo @, "#{@eventPrefix}:suggestions:select", @completeSuggestion
 
     ###*
      * Initialize AutoComplete once the view el has been populated
