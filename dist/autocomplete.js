@@ -4,7 +4,7 @@
 
   (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
-      return define(['jquery', 'bootstrap', 'underscore', 'backbone', 'marionette'], factory);
+      return define(['jquery', 'underscore', 'backbone', 'marionette'], factory);
     } else {
       return root.AutoComplete = factory(root, {}, root.Backbone.$, root._, root.Backbone, root.Backbone.Marionette);
     }
@@ -46,9 +46,9 @@
 
       Collection.prototype._initializeListeners = function() {
         this.listenTo(this, 'find', this.fetchNewSuggestions);
-        this.listenTo(this, 'select:active', this.selectActive);
-        this.listenTo(this, 'highlight:next', this.selectNext);
-        this.listenTo(this, 'highlight:previous', this.selectPrevious);
+        this.listenTo(this, 'select', this.select);
+        this.listenTo(this, 'highlight:next', this.highlightNext);
+        this.listenTo(this, 'highlight:previous', this.highlightPrevious);
         return this.listenTo(this, 'clear', this.reset);
       };
 
@@ -191,36 +191,36 @@
 
       /**
        * Select first suggestion unless the suggestion list
-       * has been navigated then select where it was navigated to
+       * has been navigated then select at the current index
        */
 
-      Collection.prototype.selectActive = function() {
-        return this.trigger('selected', this.at(this.isStarted() ? this.index : 0));
+      Collection.prototype.select = function() {
+        return this.trigger('select', this.at(this.isStarted() ? this.index : 0));
       };
 
 
       /**
-       * Select previous item
+       * highlight previous item
        */
 
-      Collection.prototype.selectPrevious = function() {
+      Collection.prototype.highlightPrevious = function() {
         if (!(this.isFirst() || !this.isStarted())) {
-          this.deselect(this.index);
-          return this.select(this.index = this.index - 1);
+          this.deHighlight(this.index);
+          return this.highlight(this.index = this.index - 1);
         }
       };
 
 
       /**
-       * Select next item
+       * highlight next item
        */
 
-      Collection.prototype.selectNext = function() {
+      Collection.prototype.highlightNext = function() {
         if (!this.isLast()) {
           if (this.isStarted()) {
-            this.deselect(this.index);
+            this.deHighlight(this.index);
           }
-          return this.select(this.index = this.index + 1);
+          return this.highlight(this.index = this.index + 1);
         }
       };
 
@@ -260,13 +260,13 @@
 
 
       /**
-       * Trigger selection on the model
+       * Trigger highlight on suggestion
        * 
        * @param  {Number} index
        * @return {Backbone.Model}
        */
 
-      Collection.prototype.select = function(index) {
+      Collection.prototype.highlight = function(index) {
         var model;
         model = this.at(index);
         return model.trigger('highlight', model);
@@ -274,13 +274,13 @@
 
 
       /**
-       * Trigger deselection on the model
+       * Trigger highliht removal on the model
        * 
        * @param  {Number} index
        * @return {Backbone.Model}
        */
 
-      Collection.prototype.deselect = function(index) {
+      Collection.prototype.deHighlight = function(index) {
         var model;
         model = this.at(index);
         return model.trigger('highlight:remove', model);
@@ -320,7 +320,7 @@
        * @type {String}
        */
 
-      ChildView.prototype.template = _.template('<a href="#" data-action="select"><%= value %></a>');
+      ChildView.prototype.template = _.template('<a href="#"><%= value %></a>');
 
 
       /**
@@ -366,7 +366,7 @@
 
       ChildView.prototype.select = function(e) {
         e.preventDefault();
-        return this.model.trigger('selected', this.model);
+        return this.model.trigger('select', this.model);
       };
 
       return ChildView;
@@ -395,19 +395,10 @@
 
 
       /**
-       * @type {AutoCompleteChildView}
+       * @type {AutoComplete.ChildView}
        */
 
       CollectionView.prototype.childView = AutoComplete.ChildView;
-
-
-      /**
-       * Setup CollectionView
-       * 
-       * @param {Object} options
-       */
-
-      CollectionView.prototype.initialize = function(options) {};
 
       return CollectionView;
 
@@ -517,7 +508,7 @@
         this.listenTo(this.suggestionsCollection, 'all', this.relayCollectionEvent);
         this.listenTo(this, "" + this.eventPrefix + ":open", this.open);
         this.listenTo(this, "" + this.eventPrefix + ":close", this.close);
-        return this.listenTo(this, "" + this.eventPrefix + ":suggestions:selected", this.completeSuggestion);
+        return this.listenTo(this, "" + this.eventPrefix + ":suggestions:select", this.completeSuggestion);
       };
 
 
@@ -533,7 +524,7 @@
 
       /**
        * Wrap the input element inside the `containerTemplate` and
-       * then append the `dropdownTemplate`
+       * then append `AutoComplete.CollectionView`
        */
 
       Behavior.prototype._initializeAutoComplete = function() {
@@ -547,7 +538,7 @@
       /**
        * Setup Collection view
        * 
-       * @return {AutoCompleteCollectionView}
+       * @return {AutoComplete.CollectionView}
        */
 
       Behavior.prototype._getCollectionView = function() {
@@ -572,6 +563,9 @@
 
       /**
        * Relay the collecction events
+       *
+       * @param {String} name
+       * @param {Array} args
        */
 
       Behavior.prototype.relayCollectionEvent = function(name, args) {
@@ -580,7 +574,7 @@
 
 
       /**
-       * Trigger an event on the behavior and view
+       * Trigger an event on this and view
        */
 
       Behavior.prototype.triggerShared = function() {
@@ -705,7 +699,7 @@
 
 
       /**
-       * Clean up views
+       * Clean up `AutoComplete.CollectionView`
        */
 
       Behavior.prototype.onDestroy = function() {
