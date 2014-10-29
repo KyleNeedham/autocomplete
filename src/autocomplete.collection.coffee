@@ -8,17 +8,8 @@
      * @param {(Array|Backbone.Model[])} models
      * @param {Object} options
     ###
-    constructor: (models, @options) ->
+    initialize: (models, @options) ->
       @setDataset options.data
-      super
-
-    ###*
-     * Initialize AutoCompleteCollection
-     * 
-     * @param {(Array|Backbone.Model[])} models
-     * @param {Object} options
-    ###
-    initialize: (models, options) ->
       @_initializeListeners()
 
     ###*
@@ -67,13 +58,13 @@
     ###*
      * Get query parameters
      *
-     * @param {String} string
+     * @param {String} query
      * @return {Obect}
     ###
-    buildParams: (search) ->
+    buildParams: (query) ->
       data = {}
 
-      data[@options.keys.search] = search 
+      data[@options.keys.query] = query 
 
       _.each @options.keys, (key) ->
         data[key] ?= @options.values[key]
@@ -85,46 +76,46 @@
      * Get suggestions based on the current input. Either query
      * the api or filter the dataset
      * 
-     * @param {String} search
+     * @param {String} query
     ###
-    fetchNewSuggestions: (search) ->
+    fetchNewSuggestions: (query) ->
       switch @options.type
         when 'remote'
-          @fetch _.extend url: @options.remote, @buildParams search
+          @fetch _.extend url: @options.remote, @buildParams query
         when 'dataset'
-          @filterDataSet search
+          @filterDataSet query
         else
           throw new Error 'Unkown type passed'
 
     ###*
      * Filter the dataset
      *
-     * @param {String} string
+     * @param {String} query
     ###
-    filterDataSet: (search) ->
+    filterDataSet: (query) ->
       matches = []
 
       _.each @dataset, (suggestion) ->
         return false if matches.length >= @options.values.limit
 
-        matches.push suggestion if @matches suggestion.value, search
+        matches.push suggestion if @matches suggestion.value, query
 
       , @
 
       @reset matches
 
     ###*
-     * Check to see if the search matches the suggestion
+     * Check to see if the query matches the suggestion
      * 
      * @param  {String} suggestion
-     * @param  {String} search
+     * @param  {String} query
      * @return {Boolean}
     ###
-    matches: (suggestion, search) ->
+    matches: (suggestion, query) ->
       suggestion = @normalizeValue suggestion
-      search = @normalizeValue search
+      query = @normalizeValue query
 
-      suggestion.indexOf(search) >= 0
+      suggestion.indexOf(query) >= 0
 
     ###*
      * Normalize string
