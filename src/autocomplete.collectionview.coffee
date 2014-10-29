@@ -10,3 +10,8 @@
      * @type {String}
     ###
     className: 'ac-suggestions dropdown-menu'
+
+    emptyView:
+    	Marionette.ItemView.extend
+    		tagName: 'li',
+    		template: _.template '<a href="#">No suggestions available</a>'
