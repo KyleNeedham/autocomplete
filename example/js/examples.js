@@ -6,6 +6,10 @@ var ItemView = Backbone.Marionette.ItemView.extend({
 
   template: '#example',
 
+  ui: {
+    autocomplete: 'input'
+  },
+
   behaviors: {
     AutoComplete: {
       behaviorClass: AutoComplete.Behavior,
