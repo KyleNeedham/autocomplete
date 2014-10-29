@@ -5,7 +5,10 @@
      * @type {String}
     ###
     tagName: 'li'
-
+    
+    ###*
+     * @type {String}
+    ###
     className: 'ac-suggestion'
 
     ###*
