@@ -16,11 +16,16 @@
 </head>
 <body class="fade">
   <div class="container">
-    <div class="page-header">
-      <h1 class="text-center">AutoComplete</h1>
+    <div class="page-header text-center">
+      <h1>AutoComplete</h1>
+      <p>
+        <a href="#exampleContainerBasic">Basic example</a> - 
+        <a href="#exampleContainerCustom">Custom Templates</a> - 
+        <a href="#exampleContainerCustom">Using a Remote</a>
+      </p>
     </div>
     <div class="row">
-      <div class="col-xs-offset-4 col-xs-4 text-center" id="exampleContainer"></div>
+      <div class="col-xs-offset-4 col-xs-4 text-center" id="exampleContainerBasic"></div>
     </div>
     <div class="row">
       <div class="col-xs-4">
@@ -28,6 +33,14 @@
       </div>
       <div class="col-xs-8">
         <script src="https://gist.github.com/KyleNeedham/df7302d45510af3e9281.js"></script>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-offset-4 col-xs-4 text-center" id="exampleContainerCustom"></div>
+    </div>
+    <div class="row row-custom-gists">
+      <div class="col-xs-12">
+        <script src="https://gist.github.com/KyleNeedham/66e113454f378db88447.js"></script>
       </div>
     </div>
   </div>
@@ -38,6 +51,15 @@
     <div class="row">
       <div class="col-xs-12">
         <input class="form-control input-lg" placeholder="Counties of the world">
+      </div>
+    </div>
+  </script>
+
+  <script id="exampleCustom" type="text/html">
+    <h2>Cutsom Template/Remote</h2>
+    <div class="row">
+      <div class="col-xs-12">
+        <input class="form-control input-lg" placeholder="Movie Titles">
       </div>
     </div>
   </script>
@@ -63,6 +85,21 @@
       <span class="label label-danger pull-right"><%= count %></span>
     </td>
   </script>
+
+  <script id="cutsomChild" type="text/html">
+    <a href="#">
+      <div class="media">
+        <div class="media-left">
+          <img src="<%= posters.thumbnail %>">
+        </div>
+        <div class="media-body">
+          <h4 class="media-heading"><%= title %></h4>
+          <%= synopsis.substr(0, 75) %>
+        </div>
+      </div>
+    </a>
+  </script>
+
   <script type="text/javascript" src="./js/main.js"></script>
 </body>
 </html>

@@ -5,13 +5,21 @@ h3 {
   font-family: Arvo, serif;
 }
 
-#exampleContainer {
+#exampleContainerBasic,
+#exampleContainerCustom {
   margin-bottom: 50px;
 }
 
-#exampleContainer input {
+#exampleContainerBasic input,
+#exampleContainerCustom input {
   border-width: 2px;
   box-shadow: none;
+}
+
+#exampleContainerCustom {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 1px solid #ddd;
 }
 
 .events-container {
@@ -39,4 +47,26 @@ h3 {
 
 .events-container tr td .name {
   font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+}
+
+.media {
+  margin-bottom: 5px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.media-body {
+  white-space: normal;
+}
+
+.row-custom-gists .gist-file
+{
+  width: 53%;
+  float: left;
+}
+
+.row-custom-gists .gist-file:first-child {
+  width: 45%;
+  margin-right: 2%;
 }
