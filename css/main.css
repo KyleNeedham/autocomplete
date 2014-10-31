@@ -1,0 +1,42 @@
+ 
+h1,
+h2,
+h3 {
+  font-family: Arvo, serif;
+}
+
+#exampleContainer {
+  margin-bottom: 50px;
+}
+
+#exampleContainer input {
+  border-width: 2px;
+  box-shadow: none;
+}
+
+.events-container {
+  width: 100%;
+  font-size: 13px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.events-container thead {
+  background-color: #f7f7f7;
+  color: #999;
+  border-bottom: 1px solid #ddd;
+}
+
+.events-container tr td {
+  padding: 5px;
+}
+
+.events-container tr td:first-child {
+  font-size: 12px;
+  color: #aaa;
+  border-right: 1px solid #eee;
+}
+
+.events-container tr td .name {
+  font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+}
