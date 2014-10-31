@@ -15,6 +15,6 @@
      * @type {Marionette.ItemView}
     ###
     emptyView:
-    	Marionette.ItemView.extend
-    		tagName: 'li',
-    		template: _.template '<a href="#">No suggestions available</a>'
+      Marionette.ItemView.extend
+        tagName: 'li',
+        template: _.template '<a href="#">No suggestions available</a>'
