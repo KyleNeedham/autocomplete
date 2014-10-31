@@ -20,7 +20,7 @@
      * @type {Object}
     ###
     events:
-      'click a': 'select'
+      'click': 'select'
 
     ###*
      * @type {Object}
