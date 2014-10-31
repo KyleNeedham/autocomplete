@@ -134,8 +134,7 @@
     ###
     onKeydown: ($e) ->
       key = $e.which or $e.keyCode
-      $e.preventDefault()
-      $e.stopPropagation()
+      
       unless @$autocomplete.val().length < @options.minLength
         if @actionKeysMap[key]? then @doAction(key, $e) else @updateSuggestions @$autocomplete.val()
 
@@ -154,7 +153,8 @@
      * @param {jQuery.Event} $e
     ###
     doAction: (keycode, $e) ->
-
+      $e.preventDefault()
+      $e.stopPropagation()
     
       unless @suggestions.isEmpty()
         switch @actionKeysMap[keycode]

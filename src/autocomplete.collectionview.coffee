@@ -11,6 +11,9 @@
     ###
     className: 'ac-suggestions dropdown-menu'
 
+    ###*
+     * @type {Marionette.ItemView}
+    ###
     emptyView:
     	Marionette.ItemView.extend
     		tagName: 'li',
