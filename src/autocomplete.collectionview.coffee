@@ -12,6 +12,12 @@
     className: 'ac-suggestions dropdown-menu'
 
     ###*
+     * @type {Object}
+    ###
+    attributes:
+      style: 'max-width: 100%; max-height: 300px; overflow: auto;'
+
+    ###*
      * @type {Marionette.ItemView}
     ###
     emptyView:
