@@ -38,22 +38,24 @@
      * @return {Object}
     ###
     parse: (suggestions, limit) ->
+      suggestions = @getValue suggestions, @options.parseKey if @options.parseKey
       suggestions = _.take suggestions, @options.values.limit if limit
 
       _.map suggestions, (suggestion) ->
-        _.extend suggestion, value: @getValue suggestion
+        _.extend suggestion, value: @getValue suggestion, @options.valueKey
       , @
 
     ###*
-     * Get the value to filter on and display in the suggestions list
+     * Get the value from an object using a string
      * 
-     * @param  {Object} suggestion
+     * @param  {Object} obj
+     * @param  {String} prop
      * @return {String}
     ###
-    getValue: (suggestion) ->
-      _.reduce @options.valueKey.split('.'), (segment, property) ->
+    getValue: (obj, prop) ->
+      _.reduce prop.split('.'), (segment, property) ->
         segment[property]
-      , suggestion
+      , obj
 
     ###*
      * Get query parameters
@@ -61,13 +63,13 @@
      * @param {String} query
      * @return {Obect}
     ###
-    buildParams: (query) ->
+    getParams: (query) ->
       data = {}
 
       data[@options.keys.query] = query 
 
-      _.each @options.keys, (key) ->
-        data[key] ?= @options.values[key]
+      _.each @options.keys, (value, key) ->
+        data[value] ?= @options.values[key]
       , @
 
       { data }
@@ -81,7 +83,7 @@
     fetchNewSuggestions: (query) ->
       switch @options.type
         when 'remote'
-          @fetch _.extend url: @options.remote, @buildParams query
+          @fetch _.extend url: @options.remote, @getParams query
         when 'dataset'
           @filterDataSet query
         else

@@ -15,6 +15,7 @@
           type: 'remote'
           remote: null
           data: []
+          parseKey: null
           valueKey: 'value'
           keys:
             query: 'query'
