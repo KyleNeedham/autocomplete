@@ -41,7 +41,7 @@
       suggestions = _.take suggestions, @options.values.limit if limit
 
       _.map suggestions, (suggestion) ->
-        value: @getValue suggestion
+        _.extend suggestion, value: @getValue suggestion
       , @
 
     ###*
@@ -102,7 +102,7 @@
 
       , @
 
-      @reset matches
+      @set matches
 
     ###*
      * Check to see if the query matches the suggestion
