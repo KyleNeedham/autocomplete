@@ -103,7 +103,7 @@ ExampleContainerCustomView = Backbone.Marionette.ItemView.extend({
           },
           values: {
             apiKey: 'wfppj2bnmxkfhrvts3a2nuuk',
-            limit: 5
+            limit: 3
           }
         }
       },
@@ -121,4 +121,3 @@ ExampleContainerCustomView = Backbone.Marionette.ItemView.extend({
 (new ExampleContainerCustomView()).render();
 
 $('body').addClass('in');
-
