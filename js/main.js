@@ -111,8 +111,14 @@ ExampleContainerCustomView = Backbone.Marionette.ItemView.extend({
   }
 });
 
+Backbone.ajax = function(request) {
+  request.dataType = 'jsonp';
+  return $.ajaxSettings(request);
+}
+
 (new ExampleContainerBasicView({triggeredEvents: triggeredEvents})).render();
 (new EventsView({collection: triggeredEvents})).render();
 (new ExampleContainerCustomView()).render();
 
 $('body').addClass('in');
+
