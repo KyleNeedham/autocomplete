@@ -15,7 +15,7 @@
      * @type {Object}
     ###
     attributes:
-      style: 'max-width: 100%; max-height: 300px; overflow: auto;'
+      style: 'max-width: 100%;'
 
     ###*
      * @type {Marionette.ItemView}
