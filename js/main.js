@@ -51,11 +51,13 @@ ExampleContainerBasicView = Backbone.Marionette.ItemView.extend({
   },
 
   pushEvents: function(name) {
-    this.options.triggeredEvents.add({
-      count: 1,
-      index: this.options.triggeredEvents.length + 1,
-      name: name
-    });
+    if (name.indexOf('autocomplete') >= 0) {
+      this.options.triggeredEvents.add({
+        count: 1,
+        index: this.options.triggeredEvents.length + 1,
+        name: name
+      });
+    }
   }
 });
 
@@ -74,6 +76,11 @@ EventsView = Backbone.Marionette.CompositeView.extend({
     modelEvents: {
       'change:count': 'render'
     }
+  }),
+
+  emptyView: Backbone.Marionette.ItemView.extend({
+    tagName: 'tr',
+    template: _.template('<td class="text-center">Start searching for a country to see the associated events.</td>')
   })
 });
 
