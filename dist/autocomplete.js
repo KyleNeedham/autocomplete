@@ -14,6 +14,10 @@
     AutoComplete.Collection = (function(_super) {
       __extends(Collection, _super);
 
+      function Collection() {
+        return Collection.__super__.constructor.apply(this, arguments);
+      }
+
 
       /**
        * Setup remote collection
@@ -23,21 +27,9 @@
        * @param {Object} options
        */
 
-      function Collection(models, options) {
-        this.options = options;
-        this.setDataset(models);
-        Collection.__super__.constructor.call(this, [], options);
-      }
-
-
-      /**
-       * Initialize AutoCompleteCollection
-       * 
-       * @param {(Array|Backbone.Model[])} models
-       * @param {Object} options
-       */
-
       Collection.prototype.initialize = function(models, options) {
+        this.options = options;
+        this.setDataset(options.data);
         return this._initializeListeners();
       };
 
@@ -75,44 +67,48 @@
        */
 
       Collection.prototype.parse = function(suggestions, limit) {
+        if (this.options.parseKey) {
+          suggestions = this.getValue(suggestions, this.options.parseKey);
+        }
         if (limit) {
-          suggestions = _.take(suggestions, this.options.paramValues.limit);
+          suggestions = _.take(suggestions, this.options.values.limit);
         }
         return _.map(suggestions, function(suggestion) {
-          return {
-            value: this.getValue(suggestion)
-          };
+          return _.extend(suggestion, {
+            value: this.getValue(suggestion, this.options.valueKey)
+          });
         }, this);
       };
 
 
       /**
-       * Get the value to filter on and display in the suggestions list
+       * Get the value from an object using a string
        * 
-       * @param  {Object} suggestion
+       * @param  {Object} obj
+       * @param  {String} prop
        * @return {String}
        */
 
-      Collection.prototype.getValue = function(suggestion) {
-        return _.reduce(this.options.valueKey.split('.'), function(segment, property) {
+      Collection.prototype.getValue = function(obj, prop) {
+        return _.reduce(prop.split('.'), function(segment, property) {
           return segment[property];
-        }, suggestion);
+        }, obj);
       };
 
 
       /**
        * Get query parameters
        *
-       * @param {String} string
+       * @param {String} query
        * @return {Obect}
        */
 
-      Collection.prototype.buildParams = function(search) {
+      Collection.prototype.getParams = function(query) {
         var data;
         data = {};
-        data[this.options.paramKeys.search] = search;
-        _.each(this.options.paramKeys, function(key) {
-          return data[key] != null ? data[key] : data[key] = this.options.paramValues[key];
+        data[this.options.keys.query] = query;
+        _.each(this.options.keys, function(value, key) {
+          return data[value] != null ? data[value] : data[value] = this.options.values[key];
         }, this);
         return {
           data: data
@@ -124,17 +120,17 @@
        * Get suggestions based on the current input. Either query
        * the api or filter the dataset
        * 
-       * @param {String} search
+       * @param {String} query
        */
 
-      Collection.prototype.fetchNewSuggestions = function(search) {
+      Collection.prototype.fetchNewSuggestions = function(query) {
         switch (this.options.type) {
           case 'remote':
             return this.fetch(_.extend({
               url: this.options.remote
-            }, this.buildParams(search)));
+            }, this.getParams(query)));
           case 'dataset':
-            return this.filterDataSet(search);
+            return this.filterDataSet(query);
           default:
             throw new Error('Unkown type passed');
         }
@@ -144,36 +140,36 @@
       /**
        * Filter the dataset
        *
-       * @param {String} string
+       * @param {String} query
        */
 
-      Collection.prototype.filterDataSet = function(search) {
+      Collection.prototype.filterDataSet = function(query) {
         var matches;
         matches = [];
         _.each(this.dataset, function(suggestion) {
-          if (matches.length >= this.options.paramValues.limit) {
+          if (matches.length >= this.options.values.limit) {
             return false;
           }
-          if (this.matches(suggestion.value, search)) {
+          if (this.matches(suggestion.value, query)) {
             return matches.push(suggestion);
           }
         }, this);
-        return this.reset(matches);
+        return this.set(matches);
       };
 
 
       /**
-       * Check to see if the search matches the suggestion
+       * Check to see if the query matches the suggestion
        * 
        * @param  {String} suggestion
-       * @param  {String} search
+       * @param  {String} query
        * @return {Boolean}
        */
 
-      Collection.prototype.matches = function(suggestion, search) {
+      Collection.prototype.matches = function(suggestion, query) {
         suggestion = this.normalizeValue(suggestion);
-        search = this.normalizeValue(search);
-        return suggestion.indexOf(search) >= 0;
+        query = this.normalizeValue(query);
+        return suggestion.indexOf(query) >= 0;
       };
 
 
@@ -315,6 +311,11 @@
 
       ChildView.prototype.tagName = 'li';
 
+
+      /**
+       * @type {String}
+       */
+
       ChildView.prototype.className = 'ac-suggestion';
 
 
@@ -330,7 +331,7 @@
        */
 
       ChildView.prototype.events = {
-        'click a': 'select'
+        'click': 'select'
       };
 
 
@@ -397,15 +398,27 @@
 
 
       /**
-       * @type {AutoComplete.ChildView}
+       * @type {Object}
        */
 
-      CollectionView.prototype.childView = AutoComplete.ChildView;
+      CollectionView.prototype.attributes = {
+        style: 'max-width: 100%;'
+      };
+
+
+      /**
+       * @type {Marionette.ItemView}
+       */
+
+      CollectionView.prototype.emptyView = Marionette.ItemView.extend({
+        tagName: 'li',
+        template: _.template('<a href="#">No suggestions available</a>')
+      });
 
       return CollectionView;
 
     })(Marionette.CollectionView);
-    return AutoComplete.Behavior = (function(_super) {
+    AutoComplete.Behavior = (function(_super) {
       __extends(Behavior, _super);
 
       function Behavior() {
@@ -419,20 +432,32 @@
 
       Behavior.prototype.defaults = {
         containerTemplate: '<div class="ac-container dropdown"></div>',
-        type: 'remote',
-        data: [],
-        remote: null,
-        valueKey: 'value',
-        paramKeys: {
-          search: 'search',
-          limit: 'limit'
+        rateLimit: 100,
+        minLength: 1,
+        collection: {
+          definition: AutoComplete.Collection,
+          options: {
+            type: 'remote',
+            remote: null,
+            data: [],
+            parseKey: null,
+            valueKey: 'value',
+            keys: {
+              query: 'query',
+              limit: 'limit'
+            },
+            values: {
+              query: null,
+              limit: 10
+            }
+          }
         },
-        paramValues: {
-          search: null,
-          limit: 10
+        collectionView: {
+          definition: AutoComplete.CollectionView
         },
-        rateLimit: 500,
-        minLength: 1
+        childView: {
+          definition: AutoComplete.ChildView
+        }
       };
 
 
@@ -461,44 +486,21 @@
        * @type {Object}
        */
 
-      Behavior.prototype.ui = {
-        input: '[data-action="autocomplete"]'
-      };
-
-
-      /**
-       * @type {Object}
-       */
-
       Behavior.prototype.events = {
-        'keyup @ui.input': 'onKeydown',
-        'blur @ui.input': 'onBlur'
+        'keyup @ui.autocomplete': 'onKeydown',
+        'blur @ui.autocomplete': 'onBlur'
       };
 
 
       /**
        * Initialize AutoComplete
-       * 
-       * @param {Object} options
        */
 
       Behavior.prototype.initialize = function(options) {
-        this.options.paramKeys = _.extend(this.defaults.paramKeys, this.options.paramKeys);
-        this.options.paramValues = _.extend(this.defaults.paramValues, this.options.paramValues);
+        this.options = $.extend(true, {}, this.defaults, options);
+        this.suggestions = new this.options.collection.definition([], this.options.collection.options);
         this.updateSuggestions = _.throttle(this._updateSuggestions, this.options.rateLimit);
-        this._initializeSuggestionsCollection();
         return this._initializeListeners();
-      };
-
-
-      /**
-       * Setup the remote collection, passing options required
-       * 
-       * @return {AutoCompleteCollection}
-       */
-
-      Behavior.prototype._initializeSuggestionsCollection = function() {
-        return this.suggestionsCollection = new AutoComplete.Collection(this.options.data, _.omit(this.options, ['containerTemplate', 'rateLimit', 'minLength']));
       };
 
 
@@ -507,9 +509,10 @@
        */
 
       Behavior.prototype._initializeListeners = function() {
-        this.listenTo(this.suggestionsCollection, 'all', this.relayCollectionEvent);
+        this.listenTo(this.suggestions, 'all', this.relayCollectionEvent);
         this.listenTo(this, "" + this.eventPrefix + ":open", this.open);
         this.listenTo(this, "" + this.eventPrefix + ":close", this.close);
+        this.listenTo(this, "" + this.eventPrefix + ":suggestions:highlight", this.fillSuggestion);
         return this.listenTo(this, "" + this.eventPrefix + ":suggestions:selected", this.completeSuggestion);
       };
 
@@ -530,10 +533,11 @@
        */
 
       Behavior.prototype._initializeAutoComplete = function() {
-        this.ui.input.wrap(this.options.containerTemplate);
-        this.ui.container = this.ui.input.parent();
-        this.collectionView = this._getCollectionView();
-        return this.ui.container.append(this.collectionView.render().el);
+        this.$autocomplete = this.view.ui.autocomplete;
+        this.$autocomplete.wrap(this.options.containerTemplate);
+        this.$container = this.$autocomplete.parent();
+        this.collectionView = this.getCollectionView();
+        return this.$container.append(this.collectionView.render().el);
       };
 
 
@@ -543,9 +547,10 @@
        * @return {AutoComplete.CollectionView}
        */
 
-      Behavior.prototype._getCollectionView = function() {
-        return new AutoComplete.CollectionView({
-          collection: this.suggestionsCollection
+      Behavior.prototype.getCollectionView = function() {
+        return new this.options.collectionView.definition({
+          childView: this.options.childView.definition,
+          collection: this.suggestions
         });
       };
 
@@ -555,7 +560,7 @@
        */
 
       Behavior.prototype.setInputElementAttributes = function() {
-        return this.ui.input.addClass('ac-input').attr({
+        return this.$autocomplete.addClass('ac-input').attr({
           autocomplete: 'off',
           spellcheck: false,
           dir: 'auto'
@@ -595,11 +600,11 @@
       Behavior.prototype.onKeydown = function($e) {
         var key;
         key = $e.which || $e.keyCode;
-        if (!(this.ui.input.val().length < this.options.minLength)) {
+        if (!(this.$autocomplete.val().length < this.options.minLength)) {
           if (this.actionKeysMap[key] != null) {
             return this.doAction(key, $e);
           } else {
-            return this.updateSuggestions(this.ui.input.val());
+            return this.updateSuggestions(this.$autocomplete.val());
           }
         }
       };
@@ -613,7 +618,7 @@
         return setTimeout((function(_this) {
           return function() {
             if (_this.isOpen) {
-              return _this.triggerShared("" + _this.eventPrefix + ":close", _this.ui.input.val());
+              return _this.triggerShared("" + _this.eventPrefix + ":close", _this.$autocomplete.val());
             }
           };
         })(this), 250);
@@ -628,21 +633,21 @@
        */
 
       Behavior.prototype.doAction = function(keycode, $e) {
-        var keyname;
-        keyname = this.actionKeysMap[keycode];
-        if (!this.suggestionsCollection.isEmpty()) {
-          switch (keyname) {
+        $e.preventDefault();
+        $e.stopPropagation();
+        if (!this.suggestions.isEmpty()) {
+          switch (this.actionKeysMap[keycode]) {
             case 'right':
-              if ($e.target.value.length === $e.target.selectionEnd) {
-                return this.suggestionsCollection.trigger('select');
+              if (this.isSelectionEnd($e)) {
+                return this.suggestions.trigger('select');
               }
               break;
             case 'enter':
-              return this.suggestionsCollection.trigger('select');
+              return this.suggestions.trigger('select');
             case 'down':
-              return this.suggestionsCollection.trigger('highlight:next');
+              return this.suggestions.trigger('highlight:next');
             case 'up':
-              return this.suggestionsCollection.trigger('highlight:previous');
+              return this.suggestions.trigger('highlight:previous');
             case 'esc':
               return this.trigger("" + this.eventPrefix + ":close");
           }
@@ -654,14 +659,26 @@
        * Update suggestions list, never directly call this use `@updateSuggestions`
        * which is a limit throttle alias
        * 
-       * @param {String} suggestionPartial
+       * @param {String} query
        */
 
-      Behavior.prototype._updateSuggestions = function(suggestionPartial) {
+      Behavior.prototype._updateSuggestions = function(query) {
         if (!this.isOpen) {
           this.triggerShared("" + this.eventPrefix + ":open");
         }
-        return this.suggestionsCollection.trigger('find', suggestionPartial);
+        return this.suggestions.trigger('find', query);
+      };
+
+
+      /**
+       * Check to see if the cursor is at the end of the query string
+       * 
+       * @param {jQuery.Event} $e
+       * @return {Boolean}
+       */
+
+      Behavior.prototype.isSelectionEnd = function($e) {
+        return $e.target.value.length === $e.target.selectionEnd;
       };
 
 
@@ -671,32 +688,41 @@
 
       Behavior.prototype.open = function() {
         this.isOpen = true;
-        return this.ui.container.addClass('open');
+        return this.$container.addClass('open');
+      };
+
+
+      /**
+       * Show the suggestion the input field
+       * 
+       * @param  {Backbone.Model} suggestion
+       */
+
+      Behavior.prototype.fillSuggestion = function(suggestion) {
+        return this.$autocomplete.val(suggestion.get('value'));
       };
 
 
       /**
        * Complete the suggestion
        * 
-       * @param  {Backbone.Model} selection
+       * @param  {Backbone.Model} suggestion
        */
 
-      Behavior.prototype.completeSuggestion = function(selection) {
-        this.ui.input.val(selection.get('value'));
-        return this.triggerShared("" + this.eventPrefix + ":close", this.ui.input.val());
+      Behavior.prototype.completeSuggestion = function(suggestion) {
+        this.fillSuggestion(suggestion);
+        return this.triggerShared("" + this.eventPrefix + ":close", this.$autocomplete.val());
       };
 
 
       /**
        * Close the autocomplete suggestions dropdown
-       * 
-       * @param {String} suggestionPartial
        */
 
-      Behavior.prototype.close = function(suggestionPartial) {
+      Behavior.prototype.close = function() {
         this.isOpen = false;
-        this.ui.container.removeClass('open');
-        return this.suggestionsCollection.trigger('clear');
+        this.$container.removeClass('open');
+        return this.suggestions.trigger('clear');
       };
 
 
@@ -704,13 +730,14 @@
        * Clean up `AutoComplete.CollectionView`
        */
 
-      Behavior.prototype.onDestroy = function() {
+      Behavior.prototype.onBeforeDestroy = function() {
         return this.collectionView.destroy();
       };
 
       return Behavior;
 
     })(Marionette.Behavior);
+    return AutoComplete;
   });
 
 }).call(this);
