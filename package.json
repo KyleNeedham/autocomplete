@@ -1,11 +1,8 @@
 {
-  "name": "lw-autocomplete",
-  "version": "0.0.1",
+  "name": "marionette-autocomplete",
+  "version": "0.1.0",
   "description": "Marionette autocomplete behavior",
   "main": "dist/autocomplete.js",
-  "scripts": {
-    "test": "grunt travis"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/legalweb/autocomplete.git"

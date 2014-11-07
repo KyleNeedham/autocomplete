@@ -1,6 +1,6 @@
 {
-  "name": "lw-autocomplete",
-  "version": "0.0.1",
+  "name": "marionette-autocomplete",
+  "version": "0.1.0",
   "homepage": "http://bweston.me",
   "authors": [
     "Bradley Weston <me@bweston.me>",
@@ -13,6 +13,8 @@
     "globals"
   ],
   "keywords": [
+    "marionette",
+    "behavior",
     "autocomplete",
     "auto",
     "complete"
