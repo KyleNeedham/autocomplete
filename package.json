@@ -26,7 +26,6 @@
     "grunt-cli": "latest",
     "grunt-contrib-watch" : "latest",
     "grunt-contrib-coffee": "latest",
-    "grunt-contrib-jasmine": "latest",
     "grunt-contrib-uglify": "latest"
   }
 }
