@@ -3,8 +3,6 @@
 
     ###*
      * Setup remote collection
-     *
-     * @class
      * @param {(Array|Backbone.Model[])} models
      * @param {Object} options
     ###
@@ -25,7 +23,6 @@
     ###*
      * Save models passed into the constructor seperately to avoid
      * rendering the entire dataset
-     *
      * @param {(Array|Backbone.Model[])} dataset
     ###
     setDataset: (dataset) ->
@@ -47,7 +44,6 @@
 
     ###*
      * Get the value from an object using a string
-     * 
      * @param  {Object} obj
      * @param  {String} prop
      * @return {String}
@@ -59,7 +55,6 @@
 
     ###*
      * Get query parameters
-     *
      * @param {String} query
      * @return {Obect}
     ###
@@ -77,7 +72,6 @@
     ###*
      * Get suggestions based on the current input. Either query
      * the api or filter the dataset
-     * 
      * @param {String} query
     ###
     fetchNewSuggestions: (query) ->
@@ -91,7 +85,6 @@
 
     ###*
      * Filter the dataset
-     *
      * @param {String} query
     ###
     filterDataSet: (query) ->
@@ -108,7 +101,6 @@
 
     ###*
      * Check to see if the query matches the suggestion
-     * 
      * @param  {String} suggestion
      * @param  {String} query
      * @return {Boolean}
@@ -121,7 +113,6 @@
 
     ###*
      * Normalize string
-     * 
      * @return {String}
     ###
     normalizeValue: (string = '') ->
@@ -158,7 +149,6 @@
 
     ###*
      * Check to see if the first suggestion is highlighted
-     * 
      * @return {Boolean}
     ###
     isFirst: ->
@@ -166,7 +156,6 @@
 
     ###*
      * Check to see if the last suggestion is highlighted
-     * 
      * @return {Boolean}
     ###
     isLast: ->
@@ -175,7 +164,6 @@
     ###*
      * Check to see if we have navigated through the
      * suggestions list yet
-     * 
      * @return {Boolean}
     ###
     isStarted: ->
@@ -183,7 +171,6 @@
 
     ###*
      * Trigger highlight on suggestion
-     * 
      * @param  {Number} index
      * @return {Backbone.Model}
     ###
@@ -193,7 +180,6 @@
 
     ###*
      * Trigger highliht removal on the model
-     * 
      * @param  {Number} index
      * @return {Backbone.Model}
     ###

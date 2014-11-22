@@ -21,8 +21,6 @@
 
       /**
        * Setup remote collection
-       *
-       * @class
        * @param {(Array|Backbone.Model[])} models
        * @param {Object} options
        */
@@ -50,7 +48,6 @@
       /**
        * Save models passed into the constructor seperately to avoid
        * rendering the entire dataset
-       *
        * @param {(Array|Backbone.Model[])} dataset
        */
 
@@ -83,7 +80,6 @@
 
       /**
        * Get the value from an object using a string
-       * 
        * @param  {Object} obj
        * @param  {String} prop
        * @return {String}
@@ -98,7 +94,6 @@
 
       /**
        * Get query parameters
-       *
        * @param {String} query
        * @return {Obect}
        */
@@ -119,7 +114,6 @@
       /**
        * Get suggestions based on the current input. Either query
        * the api or filter the dataset
-       * 
        * @param {String} query
        */
 
@@ -139,7 +133,6 @@
 
       /**
        * Filter the dataset
-       *
        * @param {String} query
        */
 
@@ -160,7 +153,6 @@
 
       /**
        * Check to see if the query matches the suggestion
-       * 
        * @param  {String} suggestion
        * @param  {String} query
        * @return {Boolean}
@@ -175,7 +167,6 @@
 
       /**
        * Normalize string
-       * 
        * @return {String}
        */
 
@@ -225,7 +216,6 @@
 
       /**
        * Check to see if the first suggestion is highlighted
-       * 
        * @return {Boolean}
        */
 
@@ -236,7 +226,6 @@
 
       /**
        * Check to see if the last suggestion is highlighted
-       * 
        * @return {Boolean}
        */
 
@@ -248,7 +237,6 @@
       /**
        * Check to see if we have navigated through the
        * suggestions list yet
-       * 
        * @return {Boolean}
        */
 
@@ -259,7 +247,6 @@
 
       /**
        * Trigger highlight on suggestion
-       * 
        * @param  {Number} index
        * @return {Backbone.Model}
        */
@@ -273,7 +260,6 @@
 
       /**
        * Trigger highliht removal on the model
-       * 
        * @param  {Number} index
        * @return {Backbone.Model}
        */
@@ -346,7 +332,7 @@
 
 
       /**
-       * Make suggestion active
+       * Make the element that relates the current model active.
        */
 
       ChildView.prototype.highlight = function() {
@@ -355,7 +341,7 @@
 
 
       /**
-       * Remove suggestion highlight
+       * Make the element that relates to the current model inactive.
        */
 
       ChildView.prototype.removeHighlight = function() {
@@ -364,7 +350,8 @@
 
 
       /**
-       * Make the model active
+       * Make the current model active so that the autocomplete behavior
+       * can listen for this event and trigger its own selection event on the view.
        */
 
       ChildView.prototype.select = function(e) {
@@ -462,6 +449,7 @@
 
 
       /**
+       * This is the event prefix that will be used to fire all events on.
        * @type {String}
        */
 
@@ -469,6 +457,7 @@
 
 
       /**
+       * Map which code relates to what action.
        * @type {Object}
        */
 
@@ -493,7 +482,7 @@
 
 
       /**
-       * Initialize AutoComplete
+       * Setup the AutoComplete options and suggestions collection.
        */
 
       Behavior.prototype.initialize = function(options) {
@@ -543,7 +532,6 @@
 
       /**
        * Setup Collection view
-       * 
        * @return {AutoComplete.CollectionView}
        */
 
@@ -570,7 +558,6 @@
 
       /**
        * Relay the collecction events
-       *
        * @param {String} name
        * @param {Array} args
        */
@@ -593,7 +580,6 @@
 
       /**
        * Handle keydown event
-       * 
        * @param {jQuery.Event} $e
        */
 
@@ -626,8 +612,7 @@
 
 
       /**
-       * Trigger action event based on keycode name
-       * 
+       * Trigger action event based on keycode name.
        * @param {Number} keycode
        * @param {jQuery.Event} $e
        */
@@ -657,8 +642,7 @@
 
       /**
        * Update suggestions list, never directly call this use `@updateSuggestions`
-       * which is a limit throttle alias
-       * 
+       * which is a limit throttle alias.
        * @param {String} query
        */
 
@@ -672,7 +656,6 @@
 
       /**
        * Check to see if the cursor is at the end of the query string
-       * 
        * @param {jQuery.Event} $e
        * @return {Boolean}
        */
@@ -694,7 +677,6 @@
 
       /**
        * Show the suggestion the input field
-       * 
        * @param  {Backbone.Model} suggestion
        */
 
@@ -705,7 +687,6 @@
 
       /**
        * Complete the suggestion
-       * 
        * @param  {Backbone.Model} suggestion
        */
 
