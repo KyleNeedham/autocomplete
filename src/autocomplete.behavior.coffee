@@ -31,11 +31,13 @@
         definition: AutoComplete.ChildView
 
     ###*
+     * This is the event prefix that will be used to fire all events on.
      * @type {String}
     ###
     eventPrefix: 'autocomplete'
 
     ###*
+     * Map which code relates to what action.
      * @type {Object}
     ###
     actionKeysMap:
@@ -54,7 +56,7 @@
       'blur @ui.autocomplete': 'onBlur'
 
     ###*
-     * Initialize AutoComplete
+     * Setup the AutoComplete options and suggestions collection.
     ###
     initialize: (options) ->
       @options = $.extend yes, {}, @defaults, options
@@ -93,7 +95,6 @@
 
     ###*
      * Setup Collection view
-     * 
      * @return {AutoComplete.CollectionView}
     ###
     getCollectionView: ->
@@ -114,7 +115,6 @@
 
     ###*
      * Relay the collecction events
-     *
      * @param {String} name
      * @param {Array} args
     ###
@@ -130,7 +130,6 @@
 
     ###*
      * Handle keydown event
-     * 
      * @param {jQuery.Event} $e
     ###
     onKeydown: ($e) ->
@@ -148,8 +147,7 @@
       , 250
 
     ###*
-     * Trigger action event based on keycode name
-     * 
+     * Trigger action event based on keycode name.
      * @param {Number} keycode
      * @param {jQuery.Event} $e
     ###
@@ -172,8 +170,7 @@
 
     ###*
      * Update suggestions list, never directly call this use `@updateSuggestions`
-     * which is a limit throttle alias
-     * 
+     * which is a limit throttle alias.
      * @param {String} query
     ###
     _updateSuggestions: (query) ->
@@ -182,7 +179,6 @@
 
     ###*
      * Check to see if the cursor is at the end of the query string
-     * 
      * @param {jQuery.Event} $e
      * @return {Boolean}
     ###
@@ -198,7 +194,6 @@
 
     ###*
      * Show the suggestion the input field
-     * 
      * @param  {Backbone.Model} suggestion
     ###
     fillSuggestion: (suggestion) ->
@@ -206,7 +201,6 @@
       
     ###*
      * Complete the suggestion
-     * 
      * @param  {Backbone.Model} suggestion
     ###
     completeSuggestion: (suggestion) ->
