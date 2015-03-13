@@ -10,7 +10,7 @@
       minLength: 1
       
       collection:
-        definition: AutoComplete.Collection
+        class: AutoComplete.Collection
         options:
           type: 'remote'
           remote: null
@@ -25,10 +25,10 @@
             limit: 10
 
       collectionView:
-        definition: AutoComplete.CollectionView
+        class: AutoComplete.CollectionView
 
       childView:
-        definition: AutoComplete.ChildView
+        class: AutoComplete.ChildView
 
     ###*
      * This is the event prefix that will be used to fire all events on.
@@ -60,7 +60,7 @@
     ###
     initialize: (options) ->
       @options = $.extend yes, {}, @defaults, options
-      @suggestions = new @options.collection.definition [], @options.collection.options
+      @suggestions = new @options.collection.class [], @options.collection.options
       @updateSuggestions = _.throttle @_updateSuggestions, @options.rateLimit
 
       @_initializeListeners()
@@ -98,8 +98,8 @@
      * @return {AutoComplete.CollectionView}
     ###
     getCollectionView: ->
-      new @options.collectionView.definition
-        childView: @options.childView.definition
+      new @options.collectionView.class
+        childView: @options.childView.class
         collection: @suggestions
 
     ###*
