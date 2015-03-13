@@ -7,7 +7,7 @@
      * @param {Object} options
     ###
     initialize: (models, @options) ->
-      @setDataset options.data
+      @setDataset @options.data
       @_initializeListeners()
 
     ###*
