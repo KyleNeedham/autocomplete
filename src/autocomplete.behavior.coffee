@@ -73,11 +73,10 @@
      * Listen to relavent events
     ###
     startListening: ->
-      @listenTo @suggestions, 'all', @relayCollectionEvent
       @listenTo @, "#{@eventPrefix}:open", @open
       @listenTo @, "#{@eventPrefix}:close", @close
       @listenTo @, "#{@eventPrefix}:suggestions:highlight", @fillSuggestion
-      @listenTo @, "#{@eventPrefix}:suggestions:selected", @completeSuggestion
+      @listenTo @suggestions, 'selected', @completeSuggestion
 
     ###*
      * Initialize AutoComplete once the view el has been populated
@@ -116,21 +115,6 @@
           dir: 'auto'
 
     ###*
-     * Relay the collecction events.
-     * @param {String} name
-     * @param {Array} args
-    ###
-    relayCollectionEvent: (name, args) ->
-      @triggerShared "#{@eventPrefix}:suggestions:#{name}", args
-
-    ###*
-     * Trigger an event on this and view.
-    ###
-    triggerShared: ->
-      @trigger arguments...
-      @view.trigger arguments...
-
-    ###*
      * Handle keydown event.
      * @param {jQuery.Event} $e
     ###
@@ -145,7 +129,7 @@
     ###
     onBlur: ->
       setTimeout =>
-        @triggerShared "#{@eventPrefix}:close", @ui.autocomplete.val() if @isOpen
+        @trigger "#{@eventPrefix}:close", @ui.autocomplete.val() if @isOpen
       , 250
 
     ###*
@@ -176,8 +160,7 @@
      * @param {String} query
     ###
     _updateSuggestions: (query) ->
-      console.log 'called'
-      @triggerShared "#{@eventPrefix}:open" unless @isOpen
+      @trigger "#{@eventPrefix}:open" unless @isOpen
       @suggestions.trigger 'find', query
 
     ###*
@@ -201,6 +184,7 @@
     ###
     fillSuggestion: (suggestion) ->
       @ui.autocomplete.val suggestion.get 'value'
+      @view.trigger "#{@eventPrefix}:active"
       
     ###*
      * Complete the suggestion.
@@ -208,7 +192,8 @@
     ###
     completeSuggestion: (suggestion) ->
       @fillSuggestion suggestion
-      @triggerShared "#{@eventPrefix}:close", @ui.autocomplete.val()
+      @trigger "#{@eventPrefix}:close", @ui.autocomplete.val()
+      @view.trigger "#{@eventPrefix}:selected", suggestion
 
     ###*
      * Close the autocomplete suggestions dropdown.
@@ -221,7 +206,7 @@
     ###*
      * Clean up `AutoComplete.CollectionView`.
     ###
-    onBeforeDestroy: ->
+    onDestroy: ->
       @collectionView.destroy()
 
   AutoComplete
