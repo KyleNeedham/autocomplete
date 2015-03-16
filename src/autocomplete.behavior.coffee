@@ -5,8 +5,8 @@
      * @type {Object}
     ###
     defaults:
-      rateLimit: 100
-      minLength: 1
+      rateLimit: 0
+      minLength: 0
       
       collection:
         class: AutoComplete.Collection
@@ -52,12 +52,6 @@
     ###
     events:
       'keyup @ui.autocomplete': 'onKeyUp'
-      'blur @ui.autocomplete': 'onBlur'
-
-    ###*
-     * @type {jQuery}
-    ###
-    container: $ '<div class="ac-container dropdown"></div>'
 
     ###*
      * Setup the AutoComplete options and suggestions collection.
@@ -74,8 +68,6 @@
     ###
     _startListening: ->
       @listenTo @view, "#{@eventPrefix}:find", @findRelatedSuggestions
-      @listenTo @, "#{@eventPrefix}:open", @open
-      @listenTo @, "#{@eventPrefix}:close", @close
       @listenTo @, "#{@eventPrefix}:suggestions:highlight", @fillSuggestion
       @listenTo @suggestions, 'selected', @completeSuggestion
 
@@ -91,9 +83,13 @@
     ###
     _buildElement: ->
       @collectionView = @getCollectionView()
-      @ui.autocomplete.after @container
-      @container.append @collectionView.render().el
-      @setInputElementAttributes()
+
+      @input = @buildInput()
+
+      @ui.autocomplete
+        .addClass 'dropdown'
+        .append @input
+        .append @collectionView.render().el
 
     ###*
      * Setup Collection view.
@@ -107,31 +103,26 @@
     ###*
      * Set input attributes.
     ###
-    setInputElementAttributes: ->
-      @ui.autocomplete
-        .addClass 'ac-input'
+    buildInput: ->
+      $ '<input class="form-control" data-toggle="dropdown">'
         .attr
-          autocomplete: 'off'
+          autocomplete: off
           spellcheck: off
           dir: 'auto'
+          value: @ui.autocomplete.data 'value'
 
     ###*
      * Handle keyup event.
      * @param {jQuery.Event} $e
     ###
     onKeyUp: ($e) ->
-      key = $e.which or $e.keyCode
-      
-      unless @ui.autocomplete.val().length < @options.minLength
-        if @actionKeysMap[key]? then @doAction(key, $e) else @updateSuggestions @ui.autocomplete.val()
+      $e.preventDefault()
+      $e.stopPropagation()
 
-    ###*
-     * Handle blur event.
-    ###
-    onBlur: ->
-      setTimeout =>
-        @trigger "#{@eventPrefix}:close", @ui.autocomplete.val() if @isOpen
-      , 250
+      key = $e.which or $e.keyCode
+
+      unless @input.val().length < @options.minLength
+        if @actionKeysMap[key]? then @doAction(key, $e) else @updateSuggestions @input.val()
 
     ###*
      * Trigger action event based on keycode name.
@@ -139,9 +130,6 @@
      * @param {jQuery.Event} $e
     ###
     doAction: (keycode, $e) ->
-      $e.preventDefault()
-      $e.stopPropagation()
-    
       unless @suggestions.isEmpty()
         switch @actionKeysMap[keycode]
           when 'right'
@@ -159,10 +147,8 @@
      * @param {string} query
     ###
     findRelatedSuggestions: (query) ->
-      @ui.autocomplete.val query
-      @ui.autocomplete.focus()
-      # We use the private version here, since we do not want to abide to the rateLimit rule.
-      @_updateSuggestions query
+      @input.val query
+      @updateSuggestions query
 
     ###*
      * Update suggestions list, never directly call this use `@updateSuggestions`
@@ -171,7 +157,6 @@
     ###
     _updateSuggestions: (query) ->
       @_findSuggestions query
-      @trigger "#{@eventPrefix}:open" unless @isOpen
 
     ###*
      * Find suggestions that match the specified query.
@@ -189,19 +174,11 @@
       $e.target.value.length is $e.target.selectionEnd
 
     ###*
-     * Open the autocomplete suggestions dropdown.
-    ###
-    open: ->
-      @isOpen = yes
-      @container.addClass 'open'
-      @view.trigger "#{@eventPrefix}:open"
-
-    ###*
      * Show the suggestion the input field.
      * @param  {Backbone.Model} suggestion
     ###
     fillSuggestion: (suggestion) ->
-      @ui.autocomplete.val suggestion.get 'value'
+      @input.val suggestion.get 'value'
       @view.trigger "#{@eventPrefix}:active", suggestion
       
     ###*
@@ -210,17 +187,7 @@
     ###
     completeSuggestion: (suggestion) ->
       @fillSuggestion suggestion
-      @trigger "#{@eventPrefix}:close", @ui.autocomplete.val()
       @view.trigger "#{@eventPrefix}:selected", suggestion
-
-    ###*
-     * Close the autocomplete suggestions dropdown.
-    ###
-    close: ->
-      @isOpen = no
-      @container.removeClass 'open'
-      @suggestions.trigger 'clear'
-      @view.trigger "#{@eventPrefix}:close"
 
     ###*
      * Clean up `AutoComplete.CollectionView`.
