@@ -22,5 +22,8 @@
   "ignore": [
     "**/.*",
     "bower_components"
-  ]
+  ],
+  "dependencies": {
+    "backbone.marionette": "^2.4.0"
+  }
 }

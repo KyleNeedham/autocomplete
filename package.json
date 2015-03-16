@@ -26,5 +26,8 @@
     "grunt-contrib-watch" : "latest",
     "grunt-contrib-coffee": "latest",
     "grunt-contrib-uglify": "latest"
+  },
+  "dependencies": {
+    "backbone.marionette": "~2.4.0"
   }
 }
