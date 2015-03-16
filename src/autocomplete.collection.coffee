@@ -8,12 +8,12 @@
     ###
     initialize: (models, @options) ->
       @setDataset @options.data
-      @_initializeListeners()
+      @_startListening()
 
     ###*
      * Listen to relavent events
     ###
-    _initializeListeners: ->
+    _startListening: ->
       @listenTo @, 'find', @fetchNewSuggestions
       @listenTo @, 'select', @select
       @listenTo @, 'highlight:next', @highlightNext
@@ -133,7 +133,7 @@
     ###
     highlightPrevious: ->
       unless @isFirst() or not @isStarted()
-        @deHighlight @index
+        @removeHighlight @index
         @highlight @index = @index - 1
 
     ###*
@@ -143,7 +143,7 @@
       unless @isLast()
 
         if @isStarted()
-          @deHighlight @index
+          @removeHighlight @index
 
         @highlight @index = @index + 1
 
@@ -183,7 +183,7 @@
      * @param  {Number} index
      * @return {Backbone.Model}
     ###
-    deHighlight: (index) ->
+    removeHighlight: (index) ->
       model = @at index
       model.trigger 'highlight:remove', model
 
