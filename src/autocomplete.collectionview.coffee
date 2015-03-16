@@ -15,12 +15,12 @@
      * @type {Object}
     ###
     attributes:
-      style: 'max-width: 100%;'
+      style: 'width: 100%;'
 
     ###*
-     * @type {Marionette.ItemView}
+     * @return {Marionette.ItemView}
     ###
     emptyView:
       Marionette.ItemView.extend
         tagName: 'li',
-        template: _.template '<a href="#">No suggestions available</a>'
+        template: _.template "<a>No suggestions available</a>"
