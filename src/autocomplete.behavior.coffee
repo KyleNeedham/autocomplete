@@ -51,7 +51,7 @@
      * @type {Object}
     ###
     events:
-      'keyup @ui.autocomplete': 'onKeydown'
+      'keyup @ui.autocomplete': 'onKeyUp'
       'blur @ui.autocomplete': 'onBlur'
 
     ###*
@@ -73,7 +73,7 @@
      * Listen to relavent events
     ###
     _startListening: ->
-      @listenTo @view, "#{@eventPrefix}:find", @findSuggestions
+      @listenTo @view, "#{@eventPrefix}:find", @findRelatedSuggestions
       @listenTo @, "#{@eventPrefix}:open", @open
       @listenTo @, "#{@eventPrefix}:close", @close
       @listenTo @, "#{@eventPrefix}:suggestions:highlight", @fillSuggestion
@@ -116,10 +116,10 @@
           dir: 'auto'
 
     ###*
-     * Handle keydown event.
+     * Handle keyup event.
      * @param {jQuery.Event} $e
     ###
-    onKeydown: ($e) ->
+    onKeyUp: ($e) ->
       key = $e.which or $e.keyCode
       
       unless @ui.autocomplete.val().length < @options.minLength
@@ -156,19 +156,28 @@
             @trigger "#{@eventPrefix}:close"
 
     ###*
+     * @param {string} query
+    ###
+    findRelatedSuggestions: (query) ->
+      @ui.autocomplete.val query
+      @ui.autocomplete.focus()
+      # We use the private version here, since we do not want to abide to the rateLimit rule.
+      @_updateSuggestions query
+
+    ###*
      * Update suggestions list, never directly call this use `@updateSuggestions`
      * which is a limit throttle alias.
      * @param {String} query
     ###
     _updateSuggestions: (query) ->
+      @_findSuggestions query
       @trigger "#{@eventPrefix}:open" unless @isOpen
-      @findSuggestions query
 
     ###*
      * Find suggestions that match the specified query.
      * @param {string} query
     ###
-    findSuggestions: (query) ->
+    _findSuggestions: (query) ->
       @suggestions.trigger 'find', query
 
     ###*
@@ -185,6 +194,7 @@
     open: ->
       @isOpen = yes
       @container.addClass 'open'
+      @view.trigger "#{@eventPrefix}:open"
 
     ###*
      * Show the suggestion the input field.
@@ -210,6 +220,7 @@
       @isOpen = no
       @container.removeClass 'open'
       @suggestions.trigger 'clear'
+      @view.trigger "#{@eventPrefix}:close"
 
     ###*
      * Clean up `AutoComplete.CollectionView`.
