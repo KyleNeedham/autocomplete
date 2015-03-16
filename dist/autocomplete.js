@@ -1,6 +1,6 @@
 (function() {
-  var __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+  var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty;
 
   (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -11,8 +11,8 @@
       return root.AutoComplete = factory(root, {}, root._, root.jQuery, root.Backbone, root.Backbone.Marionette);
     }
   })(this, function(root, AutoComplete, _, $, Backbone, Marionette) {
-    AutoComplete.Collection = (function(_super) {
-      __extends(Collection, _super);
+    AutoComplete.Collection = (function(superClass) {
+      extend(Collection, superClass);
 
       function Collection() {
         return Collection.__super__.constructor.apply(this, arguments);
@@ -25,10 +25,10 @@
        * @param {Object} options
        */
 
-      Collection.prototype.initialize = function(models, options) {
-        this.options = options;
-        this.setDataset(options.data);
-        return this._initializeListeners();
+      Collection.prototype.initialize = function(models, options1) {
+        this.options = options1;
+        this.setDataset(this.options.data);
+        return this._startListening();
       };
 
 
@@ -36,7 +36,7 @@
        * Listen to relavent events
        */
 
-      Collection.prototype._initializeListeners = function() {
+      Collection.prototype._startListening = function() {
         this.listenTo(this, 'find', this.fetchNewSuggestions);
         this.listenTo(this, 'select', this.select);
         this.listenTo(this, 'highlight:next', this.highlightNext);
@@ -194,7 +194,7 @@
 
       Collection.prototype.highlightPrevious = function() {
         if (!(this.isFirst() || !this.isStarted())) {
-          this.deHighlight(this.index);
+          this.removeHighlight(this.index);
           return this.highlight(this.index = this.index - 1);
         }
       };
@@ -207,7 +207,7 @@
       Collection.prototype.highlightNext = function() {
         if (!this.isLast()) {
           if (this.isStarted()) {
-            this.deHighlight(this.index);
+            this.removeHighlight(this.index);
           }
           return this.highlight(this.index = this.index + 1);
         }
@@ -264,7 +264,7 @@
        * @return {Backbone.Model}
        */
 
-      Collection.prototype.deHighlight = function(index) {
+      Collection.prototype.removeHighlight = function(index) {
         var model;
         model = this.at(index);
         return model.trigger('highlight:remove', model);
@@ -283,8 +283,8 @@
       return Collection;
 
     })(Backbone.Collection);
-    AutoComplete.ChildView = (function(_super) {
-      __extends(ChildView, _super);
+    AutoComplete.ChildView = (function(superClass) {
+      extend(ChildView, superClass);
 
       function ChildView() {
         return ChildView.__super__.constructor.apply(this, arguments);
@@ -362,8 +362,8 @@
       return ChildView;
 
     })(Marionette.ItemView);
-    AutoComplete.CollectionView = (function(_super) {
-      __extends(CollectionView, _super);
+    AutoComplete.CollectionView = (function(superClass) {
+      extend(CollectionView, superClass);
 
       function CollectionView() {
         return CollectionView.__super__.constructor.apply(this, arguments);
@@ -389,24 +389,24 @@
        */
 
       CollectionView.prototype.attributes = {
-        style: 'max-width: 100%;'
+        style: 'width: 100%;'
       };
 
 
       /**
-       * @type {Marionette.ItemView}
+       * @return {Marionette.ItemView}
        */
 
       CollectionView.prototype.emptyView = Marionette.ItemView.extend({
         tagName: 'li',
-        template: _.template('<a href="#">No suggestions available</a>')
+        template: _.template("<a>No suggestions available</a>")
       });
 
       return CollectionView;
 
     })(Marionette.CollectionView);
-    AutoComplete.Behavior = (function(_super) {
-      __extends(Behavior, _super);
+    AutoComplete.Behavior = (function(superClass) {
+      extend(Behavior, superClass);
 
       function Behavior() {
         return Behavior.__super__.constructor.apply(this, arguments);
@@ -418,11 +418,10 @@
        */
 
       Behavior.prototype.defaults = {
-        containerTemplate: '<div class="ac-container dropdown"></div>',
         rateLimit: 100,
         minLength: 1,
         collection: {
-          definition: AutoComplete.Collection,
+          "class": AutoComplete.Collection,
           options: {
             type: 'remote',
             remote: null,
@@ -440,10 +439,10 @@
           }
         },
         collectionView: {
-          definition: AutoComplete.CollectionView
+          "class": AutoComplete.CollectionView
         },
         childView: {
-          definition: AutoComplete.ChildView
+          "class": AutoComplete.ChildView
         }
       };
 
@@ -476,9 +475,16 @@
        */
 
       Behavior.prototype.events = {
-        'keyup @ui.autocomplete': 'onKeydown',
+        'keyup @ui.autocomplete': 'onKeyUp',
         'blur @ui.autocomplete': 'onBlur'
       };
+
+
+      /**
+       * @type {jQuery}
+       */
+
+      Behavior.prototype.container = $('<div class="ac-container dropdown"></div>');
 
 
       /**
@@ -487,9 +493,9 @@
 
       Behavior.prototype.initialize = function(options) {
         this.options = $.extend(true, {}, this.defaults, options);
-        this.suggestions = new this.options.collection.definition([], this.options.collection.options);
+        this.suggestions = new this.options.collection["class"]([], this.options.collection.options);
         this.updateSuggestions = _.throttle(this._updateSuggestions, this.options.rateLimit);
-        return this._initializeListeners();
+        return this._startListening();
       };
 
 
@@ -497,12 +503,12 @@
        * Listen to relavent events
        */
 
-      Behavior.prototype._initializeListeners = function() {
-        this.listenTo(this.suggestions, 'all', this.relayCollectionEvent);
-        this.listenTo(this, "" + this.eventPrefix + ":open", this.open);
-        this.listenTo(this, "" + this.eventPrefix + ":close", this.close);
-        this.listenTo(this, "" + this.eventPrefix + ":suggestions:highlight", this.fillSuggestion);
-        return this.listenTo(this, "" + this.eventPrefix + ":suggestions:selected", this.completeSuggestion);
+      Behavior.prototype._startListening = function() {
+        this.listenTo(this.view, this.eventPrefix + ":find", this.findRelatedSuggestions);
+        this.listenTo(this, this.eventPrefix + ":open", this.open);
+        this.listenTo(this, this.eventPrefix + ":close", this.close);
+        this.listenTo(this, this.eventPrefix + ":suggestions:highlight", this.fillSuggestion);
+        return this.listenTo(this.suggestions, 'selected', this.completeSuggestion);
       };
 
 
@@ -511,8 +517,7 @@
        */
 
       Behavior.prototype.onRender = function() {
-        this._initializeAutoComplete();
-        return this.setInputElementAttributes();
+        return this._buildElement();
       };
 
 
@@ -521,34 +526,33 @@
        * then append `AutoComplete.CollectionView`
        */
 
-      Behavior.prototype._initializeAutoComplete = function() {
-        this.$autocomplete = this.view.ui.autocomplete;
-        this.$autocomplete.wrap(this.options.containerTemplate);
-        this.$container = this.$autocomplete.parent();
+      Behavior.prototype._buildElement = function() {
         this.collectionView = this.getCollectionView();
-        return this.$container.append(this.collectionView.render().el);
+        this.ui.autocomplete.after(this.container);
+        this.container.append(this.collectionView.render().el);
+        return this.setInputElementAttributes();
       };
 
 
       /**
-       * Setup Collection view
+       * Setup Collection view.
        * @return {AutoComplete.CollectionView}
        */
 
       Behavior.prototype.getCollectionView = function() {
-        return new this.options.collectionView.definition({
-          childView: this.options.childView.definition,
+        return new this.options.collectionView["class"]({
+          childView: this.options.childView["class"],
           collection: this.suggestions
         });
       };
 
 
       /**
-       * Set input attributes
+       * Set input attributes.
        */
 
       Behavior.prototype.setInputElementAttributes = function() {
-        return this.$autocomplete.addClass('ac-input').attr({
+        return this.ui.autocomplete.addClass('ac-input').attr({
           autocomplete: 'off',
           spellcheck: false,
           dir: 'auto'
@@ -557,54 +561,32 @@
 
 
       /**
-       * Relay the collecction events
-       * @param {String} name
-       * @param {Array} args
-       */
-
-      Behavior.prototype.relayCollectionEvent = function(name, args) {
-        return this.triggerShared("" + this.eventPrefix + ":suggestions:" + name, args);
-      };
-
-
-      /**
-       * Trigger an event on this and view
-       */
-
-      Behavior.prototype.triggerShared = function() {
-        var _ref;
-        this.trigger.apply(this, arguments);
-        return (_ref = this.view).trigger.apply(_ref, arguments);
-      };
-
-
-      /**
-       * Handle keydown event
+       * Handle keyup event.
        * @param {jQuery.Event} $e
        */
 
-      Behavior.prototype.onKeydown = function($e) {
+      Behavior.prototype.onKeyUp = function($e) {
         var key;
         key = $e.which || $e.keyCode;
-        if (!(this.$autocomplete.val().length < this.options.minLength)) {
+        if (!(this.ui.autocomplete.val().length < this.options.minLength)) {
           if (this.actionKeysMap[key] != null) {
             return this.doAction(key, $e);
           } else {
-            return this.updateSuggestions(this.$autocomplete.val());
+            return this.updateSuggestions(this.ui.autocomplete.val());
           }
         }
       };
 
 
       /**
-       * Handle blur event
+       * Handle blur event.
        */
 
       Behavior.prototype.onBlur = function() {
         return setTimeout((function(_this) {
           return function() {
             if (_this.isOpen) {
-              return _this.triggerShared("" + _this.eventPrefix + ":close", _this.$autocomplete.val());
+              return _this.trigger(_this.eventPrefix + ":close", _this.ui.autocomplete.val());
             }
           };
         })(this), 250);
@@ -634,9 +616,20 @@
             case 'up':
               return this.suggestions.trigger('highlight:previous');
             case 'esc':
-              return this.trigger("" + this.eventPrefix + ":close");
+              return this.trigger(this.eventPrefix + ":close");
           }
         }
+      };
+
+
+      /**
+       * @param {string} query
+       */
+
+      Behavior.prototype.findRelatedSuggestions = function(query) {
+        this.ui.autocomplete.val(query);
+        this.ui.autocomplete.focus();
+        return this._updateSuggestions(query);
       };
 
 
@@ -647,15 +640,25 @@
        */
 
       Behavior.prototype._updateSuggestions = function(query) {
+        this._findSuggestions(query);
         if (!this.isOpen) {
-          this.triggerShared("" + this.eventPrefix + ":open");
+          return this.trigger(this.eventPrefix + ":open");
         }
+      };
+
+
+      /**
+       * Find suggestions that match the specified query.
+       * @param {string} query
+       */
+
+      Behavior.prototype._findSuggestions = function(query) {
         return this.suggestions.trigger('find', query);
       };
 
 
       /**
-       * Check to see if the cursor is at the end of the query string
+       * Check to see if the cursor is at the end of the query string.
        * @param {jQuery.Event} $e
        * @return {Boolean}
        */
@@ -666,52 +669,56 @@
 
 
       /**
-       * Open the autocomplete suggestions dropdown
+       * Open the autocomplete suggestions dropdown.
        */
 
       Behavior.prototype.open = function() {
         this.isOpen = true;
-        return this.$container.addClass('open');
+        this.container.addClass('open');
+        return this.view.trigger(this.eventPrefix + ":open");
       };
 
 
       /**
-       * Show the suggestion the input field
+       * Show the suggestion the input field.
        * @param  {Backbone.Model} suggestion
        */
 
       Behavior.prototype.fillSuggestion = function(suggestion) {
-        return this.$autocomplete.val(suggestion.get('value'));
+        this.ui.autocomplete.val(suggestion.get('value'));
+        return this.view.trigger(this.eventPrefix + ":active", suggestion);
       };
 
 
       /**
-       * Complete the suggestion
+       * Complete the suggestion.
        * @param  {Backbone.Model} suggestion
        */
 
       Behavior.prototype.completeSuggestion = function(suggestion) {
         this.fillSuggestion(suggestion);
-        return this.triggerShared("" + this.eventPrefix + ":close", this.$autocomplete.val());
+        this.trigger(this.eventPrefix + ":close", this.ui.autocomplete.val());
+        return this.view.trigger(this.eventPrefix + ":selected", suggestion);
       };
 
 
       /**
-       * Close the autocomplete suggestions dropdown
+       * Close the autocomplete suggestions dropdown.
        */
 
       Behavior.prototype.close = function() {
         this.isOpen = false;
-        this.$container.removeClass('open');
-        return this.suggestions.trigger('clear');
+        this.container.removeClass('open');
+        this.suggestions.trigger('clear');
+        return this.view.trigger(this.eventPrefix + ":close");
       };
 
 
       /**
-       * Clean up `AutoComplete.CollectionView`
+       * Clean up `AutoComplete.CollectionView`.
        */
 
-      Behavior.prototype.onBeforeDestroy = function() {
+      Behavior.prototype.onDestroy = function() {
         return this.collectionView.destroy();
       };
 
