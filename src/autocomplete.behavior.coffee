@@ -68,7 +68,7 @@
     ###
     _startListening: ->
       @listenTo @view, "#{@eventPrefix}:find", @findRelatedSuggestions
-      @listenTo @, "#{@eventPrefix}:suggestions:highlight", @fillSuggestion
+      @listenTo @suggestions, 'highlight', @fillSuggestion
       @listenTo @suggestions, 'selected', @completeSuggestion
 
     ###*
