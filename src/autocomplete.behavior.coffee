@@ -184,7 +184,7 @@
     ###
     fillSuggestion: (suggestion) ->
       @ui.autocomplete.val suggestion.get 'value'
-      @view.trigger "#{@eventPrefix}:active"
+      @view.trigger "#{@eventPrefix}:active", suggestion
       
     ###*
      * Complete the suggestion.
