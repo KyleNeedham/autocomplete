@@ -67,12 +67,12 @@
       @suggestions = new @options.collection.class [], @options.collection.options
       @updateSuggestions = _.throttle @_updateSuggestions, @options.rateLimit
 
-      @startListening()
+      @_startListening()
 
     ###*
      * Listen to relavent events
     ###
-    startListening: ->
+    _startListening: ->
       @listenTo @, "#{@eventPrefix}:open", @open
       @listenTo @, "#{@eventPrefix}:close", @close
       @listenTo @, "#{@eventPrefix}:suggestions:highlight", @fillSuggestion
