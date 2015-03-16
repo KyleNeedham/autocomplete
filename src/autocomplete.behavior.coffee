@@ -73,6 +73,7 @@
      * Listen to relavent events
     ###
     _startListening: ->
+      @listenTo @view, "#{@eventPrefix}:find", @findSuggestions
       @listenTo @, "#{@eventPrefix}:open", @open
       @listenTo @, "#{@eventPrefix}:close", @close
       @listenTo @, "#{@eventPrefix}:suggestions:highlight", @fillSuggestion
@@ -161,6 +162,13 @@
     ###
     _updateSuggestions: (query) ->
       @trigger "#{@eventPrefix}:open" unless @isOpen
+      @findSuggestions query
+
+    ###*
+     * Find suggestions that match the specified query.
+     * @param {string} query
+    ###
+    findSuggestions: (query) ->
       @suggestions.trigger 'find', query
 
     ###*
