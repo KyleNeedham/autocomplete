@@ -30,11 +30,6 @@
         class: AutoComplete.ChildView
 
     ###*
-     * @type {jQuery}
-    ###
-    container: $ '<div class="ac-container dropdown"></div>'
-
-    ###*
      * This is the event prefix that will be used to fire all events on.
      * @type {String}
     ###
@@ -88,11 +83,12 @@
      * then append `AutoComplete.CollectionView`
     ###
     _buildElement: ->
+      container = $ '<div class="ac-container dropdown"></div>'
       @collectionView = @getCollectionView()
 
-      @ui.autocomplete.replaceWith @container
+      @ui.autocomplete.replaceWith container
 
-      @container
+      container
         .append @ui.autocomplete
         .append @collectionView.render().el
 
