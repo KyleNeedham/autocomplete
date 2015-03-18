@@ -115,7 +115,7 @@ ExampleContainerCustomView = Marionette.ItemView.extend({
         }
       },
       childView: {
-        definition: AutoComplete.ChildView.extend({
+        class: AutoComplete.ChildView.extend({
           template: '#cutsomChild'
         })
       }
