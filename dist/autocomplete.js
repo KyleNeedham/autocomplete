@@ -359,6 +359,7 @@
 
       ChildView.prototype.select = function(e) {
         e.preventDefault();
+        e.stopPropagation();
         return this.model.trigger('selected', this.model);
       };
 
@@ -452,13 +453,6 @@
 
 
       /**
-       * @type {jQuery}
-       */
-
-      Behavior.prototype.container = $('<div class="ac-container dropdown"></div>');
-
-
-      /**
        * This is the event prefix that will be used to fire all events on.
        * @type {String}
        */
@@ -529,9 +523,11 @@
        */
 
       Behavior.prototype._buildElement = function() {
+        var container;
+        container = $('<div class="ac-container dropdown"></div>');
         this.collectionView = this.getCollectionView();
-        this.ui.autocomplete.replaceWith(this.container);
-        return this.container.append(this.ui.autocomplete).append(this.collectionView.render().el);
+        this.ui.autocomplete.replaceWith(container);
+        return container.append(this.ui.autocomplete).append(this.collectionView.render().el);
       };
 
 
@@ -625,7 +621,7 @@
       Behavior.prototype.findRelatedSuggestions = function(query) {
         this.ui.autocomplete.val(query);
         this.updateSuggestions(query);
-        return setTimeout(this.toggleDropdown, 0);
+        return this.toggleDropdown();
       };
 
 
