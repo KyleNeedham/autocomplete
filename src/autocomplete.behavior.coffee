@@ -160,7 +160,7 @@
     findRelatedSuggestions: (query) ->
       @ui.autocomplete.val query
       @updateSuggestions query
-      setTimeout @toggleDropdown, 0
+      @toggleDropdown()
 
     ###*
      * Update suggestions list, never directly call this use `@updateSuggestions`

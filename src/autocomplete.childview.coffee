@@ -47,4 +47,6 @@
     ###
     select: (e) ->
       e.preventDefault()
+      e.stopPropagation()
+
       @model.trigger 'selected', @model
