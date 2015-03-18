@@ -1,6 +1,7 @@
 (function() {
   var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = {}.hasOwnProperty;
+    hasProp = {}.hasOwnProperty,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -20,7 +21,7 @@
 
 
       /**
-       * Setup remote collection
+       * Setup remote collection.
        * @param {(Array|Backbone.Model[])} models
        * @param {Object} options
        */
@@ -47,7 +48,7 @@
 
       /**
        * Save models passed into the constructor seperately to avoid
-       * rendering the entire dataset
+       * rendering the entire dataset.
        * @param {(Array|Backbone.Model[])} dataset
        */
 
@@ -79,7 +80,7 @@
 
 
       /**
-       * Get the value from an object using a string
+       * Get the value from an object using a string.
        * @param  {Object} obj
        * @param  {String} prop
        * @return {String}
@@ -93,7 +94,7 @@
 
 
       /**
-       * Get query parameters
+       * Get query parameters.
        * @param {String} query
        * @return {Obect}
        */
@@ -113,7 +114,7 @@
 
       /**
        * Get suggestions based on the current input. Either query
-       * the api or filter the dataset
+       * the api or filter the dataset.
        * @param {String} query
        */
 
@@ -121,7 +122,8 @@
         switch (this.options.type) {
           case 'remote':
             return this.fetch(_.extend({
-              url: this.options.remote
+              url: this.options.remote,
+              reset: true
             }, this.getParams(query)));
           case 'dataset':
             return this.filterDataSet(query);
@@ -132,13 +134,14 @@
 
 
       /**
-       * Filter the dataset
+       * Filter the dataset.
        * @param {String} query
        */
 
       Collection.prototype.filterDataSet = function(query) {
         var matches;
         matches = [];
+        this.index = -1;
         _.each(this.dataset, function(suggestion) {
           if (matches.length >= this.options.values.limit) {
             return false;
@@ -152,7 +155,7 @@
 
 
       /**
-       * Check to see if the query matches the suggestion
+       * Check to see if the query matches the suggestion.
        * @param  {String} suggestion
        * @param  {String} query
        * @return {Boolean}
@@ -166,7 +169,7 @@
 
 
       /**
-       * Normalize string
+       * Normalize string.
        * @return {String}
        */
 
@@ -180,7 +183,7 @@
 
       /**
        * Select first suggestion unless the suggestion list
-       * has been navigated then select at the current index
+       * has been navigated then select at the current index.
        */
 
       Collection.prototype.select = function() {
@@ -189,7 +192,7 @@
 
 
       /**
-       * highlight previous item
+       * highlight previous item.
        */
 
       Collection.prototype.highlightPrevious = function() {
@@ -201,7 +204,7 @@
 
 
       /**
-       * highlight next item
+       * highlight next item.
        */
 
       Collection.prototype.highlightNext = function() {
@@ -215,7 +218,7 @@
 
 
       /**
-       * Check to see if the first suggestion is highlighted
+       * Check to see if the first suggestion is highlighted.
        * @return {Boolean}
        */
 
@@ -225,7 +228,7 @@
 
 
       /**
-       * Check to see if the last suggestion is highlighted
+       * Check to see if the last suggestion is highlighted.
        * @return {Boolean}
        */
 
@@ -236,7 +239,7 @@
 
       /**
        * Check to see if we have navigated through the
-       * suggestions list yet
+       * suggestions list yet.
        * @return {Boolean}
        */
 
@@ -246,7 +249,7 @@
 
 
       /**
-       * Trigger highlight on suggestion
+       * Trigger highlight on suggestion.
        * @param  {Number} index
        * @return {Backbone.Model}
        */
@@ -259,7 +262,7 @@
 
 
       /**
-       * Trigger highliht removal on the model
+       * Trigger highliht removal on the model.
        * @param  {Number} index
        * @return {Backbone.Model}
        */
@@ -409,6 +412,7 @@
       extend(Behavior, superClass);
 
       function Behavior() {
+        this.toggleDropdown = bind(this.toggleDropdown, this);
         return Behavior.__super__.constructor.apply(this, arguments);
       }
 
@@ -418,8 +422,8 @@
        */
 
       Behavior.prototype.defaults = {
-        rateLimit: 100,
-        minLength: 1,
+        rateLimit: 0,
+        minLength: 0,
         collection: {
           "class": AutoComplete.Collection,
           options: {
@@ -445,6 +449,13 @@
           "class": AutoComplete.ChildView
         }
       };
+
+
+      /**
+       * @type {jQuery}
+       */
+
+      Behavior.prototype.container = $('<div class="ac-container dropdown"></div>');
 
 
       /**
@@ -475,16 +486,8 @@
        */
 
       Behavior.prototype.events = {
-        'keyup @ui.autocomplete': 'onKeyUp',
-        'blur @ui.autocomplete': 'onBlur'
+        'keyup @ui.autocomplete': 'onKeyUp'
       };
-
-
-      /**
-       * @type {jQuery}
-       */
-
-      Behavior.prototype.container = $('<div class="ac-container dropdown"></div>');
 
 
       /**
@@ -504,11 +507,9 @@
        */
 
       Behavior.prototype._startListening = function() {
-        this.listenTo(this.view, this.eventPrefix + ":find", this.findRelatedSuggestions);
-        this.listenTo(this, this.eventPrefix + ":open", this.open);
-        this.listenTo(this, this.eventPrefix + ":close", this.close);
-        this.listenTo(this, this.eventPrefix + ":suggestions:highlight", this.fillSuggestion);
-        return this.listenTo(this.suggestions, 'selected', this.completeSuggestion);
+        this.listenTo(this.suggestions, 'selected', this.completeSuggestion);
+        this.listenTo(this.suggestions, 'highlight', this.fillSuggestion);
+        return this.listenTo(this.view, this.eventPrefix + ":find", this.findRelatedSuggestions);
       };
 
 
@@ -517,6 +518,7 @@
        */
 
       Behavior.prototype.onRender = function() {
+        this._setInputAttributes();
         return this._buildElement();
       };
 
@@ -528,9 +530,8 @@
 
       Behavior.prototype._buildElement = function() {
         this.collectionView = this.getCollectionView();
-        this.ui.autocomplete.after(this.container);
-        this.container.append(this.collectionView.render().el);
-        return this.setInputElementAttributes();
+        this.ui.autocomplete.replaceWith(this.container);
+        return this.container.append(this.ui.autocomplete).append(this.collectionView.render().el);
       };
 
 
@@ -551,11 +552,12 @@
        * Set input attributes.
        */
 
-      Behavior.prototype.setInputElementAttributes = function() {
-        return this.ui.autocomplete.addClass('ac-input').attr({
-          autocomplete: 'off',
+      Behavior.prototype._setInputAttributes = function() {
+        return this.ui.autocomplete.attr({
+          autocomplete: false,
           spellcheck: false,
-          dir: 'auto'
+          dir: 'auto',
+          'data-toggle': 'dropdown'
         });
       };
 
@@ -567,6 +569,8 @@
 
       Behavior.prototype.onKeyUp = function($e) {
         var key;
+        $e.preventDefault();
+        $e.stopPropagation();
         key = $e.which || $e.keyCode;
         if (!(this.ui.autocomplete.val().length < this.options.minLength)) {
           if (this.actionKeysMap[key] != null) {
@@ -579,29 +583,12 @@
 
 
       /**
-       * Handle blur event.
-       */
-
-      Behavior.prototype.onBlur = function() {
-        return setTimeout((function(_this) {
-          return function() {
-            if (_this.isOpen) {
-              return _this.trigger(_this.eventPrefix + ":close", _this.ui.autocomplete.val());
-            }
-          };
-        })(this), 250);
-      };
-
-
-      /**
        * Trigger action event based on keycode name.
        * @param {Number} keycode
        * @param {jQuery.Event} $e
        */
 
       Behavior.prototype.doAction = function(keycode, $e) {
-        $e.preventDefault();
-        $e.stopPropagation();
         if (!this.suggestions.isEmpty()) {
           switch (this.actionKeysMap[keycode]) {
             case 'right':
@@ -623,13 +610,22 @@
 
 
       /**
+       * Toggle the autocomplete dropdown.
+       */
+
+      Behavior.prototype.toggleDropdown = function() {
+        return this.ui.autocomplete.dropdown('toggle');
+      };
+
+
+      /**
        * @param {string} query
        */
 
       Behavior.prototype.findRelatedSuggestions = function(query) {
         this.ui.autocomplete.val(query);
-        this.ui.autocomplete.focus();
-        return this._updateSuggestions(query);
+        this.updateSuggestions(query);
+        return setTimeout(this.toggleDropdown, 0);
       };
 
 
@@ -640,19 +636,6 @@
        */
 
       Behavior.prototype._updateSuggestions = function(query) {
-        this._findSuggestions(query);
-        if (!this.isOpen) {
-          return this.trigger(this.eventPrefix + ":open");
-        }
-      };
-
-
-      /**
-       * Find suggestions that match the specified query.
-       * @param {string} query
-       */
-
-      Behavior.prototype._findSuggestions = function(query) {
         return this.suggestions.trigger('find', query);
       };
 
@@ -665,17 +648,6 @@
 
       Behavior.prototype.isSelectionEnd = function($e) {
         return $e.target.value.length === $e.target.selectionEnd;
-      };
-
-
-      /**
-       * Open the autocomplete suggestions dropdown.
-       */
-
-      Behavior.prototype.open = function() {
-        this.isOpen = true;
-        this.container.addClass('open');
-        return this.view.trigger(this.eventPrefix + ":open");
       };
 
 
@@ -697,20 +669,8 @@
 
       Behavior.prototype.completeSuggestion = function(suggestion) {
         this.fillSuggestion(suggestion);
-        this.trigger(this.eventPrefix + ":close", this.ui.autocomplete.val());
-        return this.view.trigger(this.eventPrefix + ":selected", suggestion);
-      };
-
-
-      /**
-       * Close the autocomplete suggestions dropdown.
-       */
-
-      Behavior.prototype.close = function() {
-        this.isOpen = false;
-        this.container.removeClass('open');
-        this.suggestions.trigger('clear');
-        return this.view.trigger(this.eventPrefix + ":close");
+        this.view.trigger(this.eventPrefix + ":selected", suggestion);
+        return this.toggleDropdown();
       };
 
 
