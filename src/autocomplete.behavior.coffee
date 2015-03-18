@@ -30,6 +30,11 @@
         class: AutoComplete.ChildView
 
     ###*
+     * @type {jQuery}
+    ###
+    container: $ '<div class="ac-container dropdown"></div>'
+
+    ###*
      * This is the event prefix that will be used to fire all events on.
      * @type {String}
     ###
@@ -67,14 +72,15 @@
      * Listen to relavent events
     ###
     _startListening: ->
-      @listenTo @view, "#{@eventPrefix}:find", @findRelatedSuggestions
-      @listenTo @suggestions, 'highlight', @fillSuggestion
       @listenTo @suggestions, 'selected', @completeSuggestion
+      @listenTo @suggestions, 'highlight', @fillSuggestion
+      @listenTo @view, "#{@eventPrefix}:find", @findRelatedSuggestions
 
     ###*
      * Initialize AutoComplete once the view el has been populated
     ###
     onRender: ->
+      @_setInputAttributes()
       @_buildElement()
 
     ###*
@@ -84,11 +90,10 @@
     _buildElement: ->
       @collectionView = @getCollectionView()
 
-      @input = @buildInput()
+      @ui.autocomplete.replaceWith @container
 
-      @ui.autocomplete
-        .addClass 'dropdown'
-        .append @input
+      @container
+        .append @ui.autocomplete
         .append @collectionView.render().el
 
     ###*
@@ -103,13 +108,13 @@
     ###*
      * Set input attributes.
     ###
-    buildInput: ->
-      $ '<input class="form-control" data-toggle="dropdown">'
+    _setInputAttributes: ->
+      @ui.autocomplete
         .attr
           autocomplete: off
           spellcheck: off
           dir: 'auto'
-          value: @ui.autocomplete.data 'value'
+          'data-toggle': 'dropdown'
 
     ###*
      * Handle keyup event.
@@ -121,8 +126,8 @@
 
       key = $e.which or $e.keyCode
 
-      unless @input.val().length < @options.minLength
-        if @actionKeysMap[key]? then @doAction(key, $e) else @updateSuggestions @input.val()
+      unless @ui.autocomplete.val().length < @options.minLength
+        if @actionKeysMap[key]? then @doAction(key, $e) else @updateSuggestions @ui.autocomplete.val()
 
     ###*
      * Trigger action event based on keycode name.
@@ -144,11 +149,18 @@
             @trigger "#{@eventPrefix}:close"
 
     ###*
+     * Toggle the autocomplete dropdown.
+    ###
+    toggleDropdown: =>
+      @ui.autocomplete.dropdown 'toggle'
+
+    ###*
      * @param {string} query
     ###
     findRelatedSuggestions: (query) ->
-      @input.val query
+      @ui.autocomplete.val query
       @updateSuggestions query
+      setTimeout @toggleDropdown, 0
 
     ###*
      * Update suggestions list, never directly call this use `@updateSuggestions`
@@ -156,13 +168,6 @@
      * @param {String} query
     ###
     _updateSuggestions: (query) ->
-      @_findSuggestions query
-
-    ###*
-     * Find suggestions that match the specified query.
-     * @param {string} query
-    ###
-    _findSuggestions: (query) ->
       @suggestions.trigger 'find', query
 
     ###*
@@ -178,7 +183,7 @@
      * @param  {Backbone.Model} suggestion
     ###
     fillSuggestion: (suggestion) ->
-      @input.val suggestion.get 'value'
+      @ui.autocomplete.val suggestion.get 'value'
       @view.trigger "#{@eventPrefix}:active", suggestion
       
     ###*
@@ -188,6 +193,7 @@
     completeSuggestion: (suggestion) ->
       @fillSuggestion suggestion
       @view.trigger "#{@eventPrefix}:selected", suggestion
+      @toggleDropdown()
 
     ###*
      * Clean up `AutoComplete.CollectionView`.
