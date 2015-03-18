@@ -25,7 +25,7 @@ triggeredEvents = new (Backbone.Collection.extend({
   }
 }));
 
-ExampleContainerBasicView = Backbone.Marionette.ItemView.extend({
+ExampleContainerBasicView = Marionette.ItemView.extend({
   el: '#exampleContainerBasic',
 
   template: '#example',
@@ -61,14 +61,14 @@ ExampleContainerBasicView = Backbone.Marionette.ItemView.extend({
   }
 });
 
-EventsView = Backbone.Marionette.CompositeView.extend({
+EventsView = Marionette.CompositeView.extend({
   el: '#eventLog',
   
   template: '#events',
 
   childViewContainer: 'tbody',
 
-  childView: Backbone.Marionette.ItemView.extend({
+  childView: Marionette.ItemView.extend({
     tagName: 'tr',
     className: 'event-item',
     template: '#eventItem',
@@ -78,13 +78,13 @@ EventsView = Backbone.Marionette.CompositeView.extend({
     }
   }),
 
-  emptyView: Backbone.Marionette.ItemView.extend({
+  emptyView: Marionette.ItemView.extend({
     tagName: 'tr',
     template: _.template('<td class="text-center">Start searching for a country to see the associated events.</td>')
   })
 });
 
-ExampleContainerCustomView = Backbone.Marionette.ItemView.extend({
+ExampleContainerCustomView = Marionette.ItemView.extend({
   el: '#exampleContainerCustom',
 
   template: '#exampleCustom',
