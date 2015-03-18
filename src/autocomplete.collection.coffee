@@ -2,7 +2,7 @@
   class AutoComplete.Collection extends Backbone.Collection
 
     ###*
-     * Setup remote collection
+     * Setup remote collection.
      * @param {(Array|Backbone.Model[])} models
      * @param {Object} options
     ###
@@ -22,7 +22,7 @@
 
     ###*
      * Save models passed into the constructor seperately to avoid
-     * rendering the entire dataset
+     * rendering the entire dataset.
      * @param {(Array|Backbone.Model[])} dataset
     ###
     setDataset: (dataset) ->
@@ -43,7 +43,7 @@
       , @
 
     ###*
-     * Get the value from an object using a string
+     * Get the value from an object using a string.
      * @param  {Object} obj
      * @param  {String} prop
      * @return {String}
@@ -54,7 +54,7 @@
       , obj
 
     ###*
-     * Get query parameters
+     * Get query parameters.
      * @param {String} query
      * @return {Obect}
     ###
@@ -71,24 +71,25 @@
 
     ###*
      * Get suggestions based on the current input. Either query
-     * the api or filter the dataset
+     * the api or filter the dataset.
      * @param {String} query
     ###
     fetchNewSuggestions: (query) ->
       switch @options.type
         when 'remote'
-          @fetch _.extend url: @options.remote, @getParams query
+          @fetch _.extend url: @options.remote, reset: yes, @getParams query
         when 'dataset'
           @filterDataSet query
         else
           throw new Error 'Unkown type passed'
 
     ###*
-     * Filter the dataset
+     * Filter the dataset.
      * @param {String} query
     ###
     filterDataSet: (query) ->
       matches = []
+      @index = -1
 
       _.each @dataset, (suggestion) ->
         return false if matches.length >= @options.values.limit
@@ -100,7 +101,7 @@
       @set matches
 
     ###*
-     * Check to see if the query matches the suggestion
+     * Check to see if the query matches the suggestion.
      * @param  {String} suggestion
      * @param  {String} query
      * @return {Boolean}
@@ -112,7 +113,7 @@
       suggestion.indexOf(query) >= 0
 
     ###*
-     * Normalize string
+     * Normalize string.
      * @return {String}
     ###
     normalizeValue: (string = '') ->
@@ -123,13 +124,13 @@
 
     ###*
      * Select first suggestion unless the suggestion list
-     * has been navigated then select at the current index
+     * has been navigated then select at the current index.
     ###
     select: ->
       @trigger 'selected', @at if @isStarted() then @index else 0
 
     ###*
-     * highlight previous item
+     * highlight previous item.
     ###
     highlightPrevious: ->
       unless @isFirst() or not @isStarted()
@@ -137,7 +138,7 @@
         @highlight @index = @index - 1
 
     ###*
-     * highlight next item
+     * highlight next item.
     ###
     highlightNext: ->
       unless @isLast()
@@ -148,14 +149,14 @@
         @highlight @index = @index + 1
 
     ###*
-     * Check to see if the first suggestion is highlighted
+     * Check to see if the first suggestion is highlighted.
      * @return {Boolean}
     ###
     isFirst: ->
       @index is 0
 
     ###*
-     * Check to see if the last suggestion is highlighted
+     * Check to see if the last suggestion is highlighted.
      * @return {Boolean}
     ###
     isLast: ->
@@ -163,14 +164,14 @@
 
     ###*
      * Check to see if we have navigated through the
-     * suggestions list yet
+     * suggestions list yet.
      * @return {Boolean}
     ###
     isStarted: ->
       @index isnt -1
 
     ###*
-     * Trigger highlight on suggestion
+     * Trigger highlight on suggestion.
      * @param  {Number} index
      * @return {Backbone.Model}
     ###
@@ -179,7 +180,7 @@
       model.trigger 'highlight', model
 
     ###*
-     * Trigger highliht removal on the model
+     * Trigger highliht removal on the model.
      * @param  {Number} index
      * @return {Backbone.Model}
     ###
