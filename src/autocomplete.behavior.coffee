@@ -52,11 +52,15 @@
     ###
     events:
       'keyup @ui.autocomplete': 'onKeyUp'
+      'click @ui.autocomplete': '_stopPropagationWhenVisible'
+      'shown.bs.dropdown': 'setDropdownShown'
+      'hidden.bs.dropdown': 'setDropdownHidden'
 
     ###*
      * Setup the AutoComplete options and suggestions collection.
     ###
     initialize: (options) ->
+      @visible = no
       @options = $.extend yes, {}, @defaults, options
       @suggestions = new @options.collection.class [], @options.collection.options
       @updateSuggestions = _.throttle @_updateSuggestions, @options.rateLimit
@@ -83,12 +87,12 @@
      * then append `AutoComplete.CollectionView`
     ###
     _buildElement: ->
-      container = $ '<div class="ac-container dropdown"></div>'
+      @container = $ '<div class="ac-container dropdown"></div>'
       @collectionView = @getCollectionView()
 
-      @ui.autocomplete.replaceWith container
+      @ui.autocomplete.replaceWith @container
 
-      container
+      @container
         .append @ui.autocomplete
         .append @collectionView.render().el
 
@@ -143,6 +147,29 @@
             @suggestions.trigger 'highlight:previous'
           when 'esc'
             @trigger "#{@eventPrefix}:close"
+
+    ###*
+     * If the dropdown is visible stop propagation, so we can keep the dropdown visible.
+     * @param {jQuery.Event} e
+    ###
+    _stopPropagationWhenVisible: (e) ->
+      e.stopPropagation() if @visible
+
+    ###*
+     * Set visible to true and trigger an event on the view
+     * so specific actions can be taken when the dropdown is opened.
+    ###
+    setDropdownShown: ->
+      @visible = yes
+      @view.trigger "#{@eventPrefix}:shown"
+
+    ###*
+     * Set visible to fsldr and trigger an event on the view
+     * so specific actions can be taken when the dropdown is closed.
+    ###
+    setDropdownHidden: ->
+      @visible = no
+      @view.trigger "#{@eventPrefix}:hidden"
 
     ###*
      * Toggle the autocomplete dropdown.
