@@ -480,7 +480,10 @@
        */
 
       Behavior.prototype.events = {
-        'keyup @ui.autocomplete': 'onKeyUp'
+        'keyup @ui.autocomplete': 'onKeyUp',
+        'click @ui.autocomplete': '_stopPropagationWhenVisible',
+        'shown.bs.dropdown': 'setDropdownShown',
+        'hidden.bs.dropdown': 'setDropdownHidden'
       };
 
 
@@ -489,6 +492,7 @@
        */
 
       Behavior.prototype.initialize = function(options) {
+        this.visible = false;
         this.options = $.extend(true, {}, this.defaults, options);
         this.suggestions = new this.options.collection["class"]([], this.options.collection.options);
         this.updateSuggestions = _.throttle(this._updateSuggestions, this.options.rateLimit);
@@ -523,11 +527,10 @@
        */
 
       Behavior.prototype._buildElement = function() {
-        var container;
-        container = $('<div class="ac-container dropdown"></div>');
+        this.container = $('<div class="ac-container dropdown"></div>');
         this.collectionView = this.getCollectionView();
-        this.ui.autocomplete.replaceWith(container);
-        return container.append(this.ui.autocomplete).append(this.collectionView.render().el);
+        this.ui.autocomplete.replaceWith(this.container);
+        return this.container.append(this.ui.autocomplete).append(this.collectionView.render().el);
       };
 
 
@@ -602,6 +605,40 @@
               return this.trigger(this.eventPrefix + ":close");
           }
         }
+      };
+
+
+      /**
+       * If the dropdown is visible stop propagation, so we can keep the dropdown visible.
+       * @param {jQuery.Event} e
+       */
+
+      Behavior.prototype._stopPropagationWhenVisible = function(e) {
+        if (this.visible) {
+          return e.stopPropagation();
+        }
+      };
+
+
+      /**
+       * Set visible to true and trigger an event on the view
+       * so specific actions can be taken when the dropdown is opened.
+       */
+
+      Behavior.prototype.setDropdownShown = function() {
+        this.visible = true;
+        return this.view.trigger(this.eventPrefix + ":shown");
+      };
+
+
+      /**
+       * Set visible to fsldr and trigger an event on the view
+       * so specific actions can be taken when the dropdown is closed.
+       */
+
+      Behavior.prototype.setDropdownHidden = function() {
+        this.visible = false;
+        return this.view.trigger(this.eventPrefix + ":hidden");
       };
 
 
