@@ -4,7 +4,7 @@ It contains 4 seperate components which can be extened or completly replaced to 
 
 ## Examples
 Demostration and code examples can be found at http://kyleneedham.github.io/autocomplete/
-<img src="http://i.imgur.com/P9blLuD.jpg" />
+<img src="http://i.imgur.com/PHKXUhW.png" />
 
 ## Features
 + Fully customisable
