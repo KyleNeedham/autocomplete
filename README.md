@@ -1,5 +1,5 @@
 # Marionette Autocomplete Behavior
-Marionette Autocomplete is a behavior that adds autocmpleting functionality to your marionette application.
+Marionette Autocomplete is a behavior that adds autocompleting functionality to your marionette application.
 It contains 4 seperate components which can be extened or completly replaced to add custom functionality.
 
 ## Examples
