@@ -1,6 +1,6 @@
 {
   "name": "marionette-autocomplete",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Marionette autocomplete behavior",
   "main": "dist/autocomplete.js",
   "repository": {
@@ -28,6 +28,6 @@
     "grunt-contrib-uglify": "latest"
   },
   "dependencies": {
-    "backbone.marionette": "~2.4.0"
+    "backbone.marionette": "~2.4.5"
   }
 }

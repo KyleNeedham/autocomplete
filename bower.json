@@ -1,6 +1,6 @@
 {
   "name": "marionette-autocomplete",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "homepage": "http://eminentcode.github.io/autocomplete/",
   "authors": [
     "Kyle Needham <kylex691@hotmail.com>"
@@ -24,6 +24,6 @@
     "bower_components"
   ],
   "dependencies": {
-    "backbone.marionette": "^2.4.0"
+    "backbone.marionette": "^2.4.5"
   }
 }

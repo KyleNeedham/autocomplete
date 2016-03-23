@@ -7,7 +7,7 @@
     defaults:
       rateLimit: 0
       minLength: 0
-      
+
       collection:
         class: AutoComplete.Collection
         options:
@@ -63,7 +63,7 @@
       @visible = no
       @options = $.extend yes, {}, @defaults, options
       @suggestions = new @options.collection.class [], @options.collection.options
-      @updateSuggestions = _.throttle @_updateSuggestions, @options.rateLimit
+      @updateQuery = _.throttle @_updateQuery, @options.rateLimit
 
       @_startListening()
 
@@ -71,12 +71,12 @@
      * Listen to relavent events
     ###
     _startListening: ->
-      @listenTo @suggestions, 'selected', @completeSuggestion
-      @listenTo @suggestions, 'highlight', @fillSuggestion
+      @listenTo @suggestions, 'selected', @completeQuery
+      @listenTo @suggestions, 'highlight', @fillQuery
       @listenTo @view, "#{@eventPrefix}:find", @findRelatedSuggestions
 
     ###*
-     * Initialize AutoComplete once the view el has been populated
+     * Initialize AutoComplete once the view el has been populated.
     ###
     onRender: ->
       @_setInputAttributes()
@@ -84,7 +84,7 @@
 
     ###*
      * Wrap the input element inside the `containerTemplate` and
-     * then append `AutoComplete.CollectionView`
+     * then append `AutoComplete.CollectionView`.
     ###
     _buildElement: ->
       @container = $ '<div class="ac-container dropdown"></div>'
@@ -127,7 +127,7 @@
       key = $e.which or $e.keyCode
 
       unless @ui.autocomplete.val().length < @options.minLength
-        if @actionKeysMap[key]? then @doAction(key, $e) else @updateSuggestions @ui.autocomplete.val()
+        if @actionKeysMap[key]? then @doAction(key, $e) else @updateQuery @ui.autocomplete.val()
 
     ###*
      * Trigger action event based on keycode name.
@@ -182,15 +182,15 @@
     ###
     findRelatedSuggestions: (query) ->
       @ui.autocomplete.val query
-      @updateSuggestions query
+      @updateQuery query
       @toggleDropdown()
 
     ###*
-     * Update suggestions list, never directly call this use `@updateSuggestions`
+     * Update suggestions list, never directly call this use `@updateQuery`
      * which is a limit throttle alias.
      * @param {String} query
     ###
-    _updateSuggestions: (query) ->
+    _updateQuery: (query) ->
       @suggestions.trigger 'find', query
 
     ###*
@@ -202,19 +202,19 @@
       $e.target.value.length is $e.target.selectionEnd
 
     ###*
-     * Show the suggestion the input field.
+     * Complete the query using the highlighted suggestion.
      * @param  {Backbone.Model} suggestion
     ###
-    fillSuggestion: (suggestion) ->
+    fillQuery: (suggestion) ->
       @ui.autocomplete.val suggestion.get 'value'
       @view.trigger "#{@eventPrefix}:active", suggestion
-      
+
     ###*
-     * Complete the suggestion.
+     * Complete the query uisng the selected suggestion.
      * @param  {Backbone.Model} suggestion
     ###
-    completeSuggestion: (suggestion) ->
-      @fillSuggestion suggestion
+    completeQuery: (suggestion) ->
+      @fillQuery suggestion
       @view.trigger "#{@eventPrefix}:selected", suggestion
       @toggleDropdown()
 

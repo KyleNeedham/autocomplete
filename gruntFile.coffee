@@ -25,7 +25,7 @@ module.exports = (grunt) ->
     uglify:
       dist:
         files:
-          'dist/autocomplete.min.js': 'dist/autocomplete.js'
+          'dist/autocomplete.js': 'dist/autocomplete.js'
     watch:
       files: [
         'src/*',
