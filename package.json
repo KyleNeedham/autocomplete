@@ -5,7 +5,7 @@
   "main": "dist/autocomplete.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/legalweb/autocomplete.git"
+    "url": "git://github.com/KyleNeedham/autocomplete.git"
   },
   "keywords": [
     "autocomplete",
@@ -17,9 +17,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/legalweb/autocomplete/issues"
+    "url": "https://github.com/KyleNeedham/autocomplete/issues"
   },
-  "homepage": "https://github.com/legalweb/autocomplete",
+  "homepage": "https://github.com/KyleNeedham/autocomplete",
   "devDependencies": {
     "grunt": "latest",
     "grunt-cli": "latest",
